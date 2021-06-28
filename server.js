@@ -1,10 +1,19 @@
+//package
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 
-app.get("/", (req, res, next) => {
-  res.send("Welcome home!");
+//routes import
+const { getPosts } = require("./routes/route_post.js");
+
+//middleware
+app.use(morgan("dev"));
+
+//routes
+app.get("/", getPosts);
+
+//port a express listening
+port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`API > LISTENING ON PORT: ${port}`);
 });
-
-port = 3000;
-
-app.listen(port);
