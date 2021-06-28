@@ -4,6 +4,7 @@ const app = express();
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const expressValidator = require("express-validator");
 // const cors = require("cors");
 dotenv.config();
 
@@ -25,6 +26,7 @@ const postRoutes = require("./routes/route_post");
 
 //middleware
 app.use(express.json());
+app.use(expressValidator());
 app.use(morgan("dev"));
 
 //routes
