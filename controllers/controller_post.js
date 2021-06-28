@@ -1,17 +1,17 @@
-//packages
 //models
 const Post = require("../models/model_post");
 
-exports.getPost = (req, res) => {
-  res.json({
-    posts: [
-      { title: "SocNet in development!" },
-      { title: "Developers of SocNet are in crisis!" },
-    ],
-  });
+exports.getPosts = (req, res, next) => {
+  const posts = Post.find()
+    .then((posts) => {
+      res.status(200).json({ posts: posts });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
-exports.createPost = (req, res) => {
+exports.createPost = (req, res, next) => {
   const post = new Post(req.body);
   console.log(`API > CREATING POST: ${post}`);
 
