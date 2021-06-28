@@ -22,12 +22,33 @@ exports.createPostValidator = (req, res, next) => {
 
   //ak nastali nejake errory vo validacii, tak userovi vrat prvy v poradi
   if (errors) {
-    const firstErrorInLine = errors.map((error) => error.msg)[0];
-    return res.status(400).json({ error: firstErrorInLine });
+    const firstErrorInLine = errors.map((error) => error.msg)[0]; //z errorov ktore su v "errors" zober iba error message "msg" a do "firstErrorInLine" nahraj iba ten prvy ([0])
+    return res.status(401).json({ error: firstErrorInLine });
   }
 
-  //pokracovanie bohu aplikacie
+  //pokracovanie v app loope
   next();
 };
 
-exports.createUserValidator = (req, res, next) => {};
+exports.userRegisterValidator = (req, res, next) => {
+  //validator for username
+  req.check("username", "Username must not be empty").notEmpty();
+  req
+    .check("username", "Username's length must be between 3 to 25 characters")
+    .isLength({ min: 3, max: 25 });
+
+  //validator for password
+  req.check("password", "Password must not be empty").notEmpty();
+  req
+    .check("password", "Password's length must be at least 8 characters")
+    .isLength({ min: 8 });
+
+  //check for error
+  const errors = req.validationErrors();
+  if (errors) {
+    const firstErrorInLine = errors.map((error) => error.msg)[0]; //z errorov ktore su v "errors" zober iba error message "msg" a do "firstErrorInLine" nahraj iba ten prvy ([0])
+    return res.status(401).json({ error: firstErrorInLine });
+  }
+  //pokracovanie v app loope
+  next();
+};

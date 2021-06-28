@@ -7,6 +7,7 @@ exports.signupUser = async (req, res) => {
 
   const user = await new User(req.body);
   await user.save();
+  console.log(`API > SAVING USER TO DB: ${user}`);
   res.status(200).json({
     user: { username: user.username, _id: user._id, created: user.created },
     message: "Registration successful",

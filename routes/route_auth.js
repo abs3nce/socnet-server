@@ -10,6 +10,10 @@ const authController = require("../controllers/controller_auth");
 const authValidator = require("../validator/index");
 
 //routes a ich metody
-router.post("/users/register", authController.signupUser);
+router.post(
+  "/users/register",
+  authValidator.userRegisterValidator,
+  authController.signupUser
+);
 
 module.exports = router;
