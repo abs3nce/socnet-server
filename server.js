@@ -4,13 +4,14 @@ const app = express();
 const morgan = require("morgan");
 
 //routes import
-const { getPosts } = require("./routes/route_post.js");
+const postRoutes = require("./routes/route_post");
 
 //middleware
 app.use(morgan("dev"));
 
 //routes
-app.get("/", getPosts);
+//funguju ako middleware, pri accessnuti "/" presmeruju na routes_post
+app.use("/", postRoutes);
 
 //port a express listening
 port = process.env.PORT || 3000;
