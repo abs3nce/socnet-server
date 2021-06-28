@@ -23,6 +23,7 @@ mongoose.connection.on("error", (err) => {
 
 //routes import
 const postRoutes = require("./routes/route_post");
+const authRoutes = require("./routes/route_auth");
 
 //middleware
 app.use(express.json());
@@ -32,6 +33,7 @@ app.use(morgan("dev"));
 //routes
 //funguju ako middleware, pri accessnuti "/" presmeruju na routes_post
 app.use("/", postRoutes);
+app.use("/", authRoutes);
 
 //port a express listening
 const port = process.env.PORT || 8080;

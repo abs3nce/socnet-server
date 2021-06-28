@@ -29,3 +29,5 @@ exports.createPostValidator = (req, res, next) => {
   //pokracovanie bohu aplikacie
   next();
 };
+
+exports.createUserValidator = (req, res, next) => {};
