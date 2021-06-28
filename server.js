@@ -4,6 +4,7 @@ const app = express();
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+// const cors = require("cors");
 dotenv.config();
 
 //database
@@ -16,13 +17,14 @@ mongoose
     console.log(`DB > CONNECTION SUCCESSFUL`);
   });
 mongoose.connection.on("error", (err) => {
-  console.log(`DB > CONNECTION ERROR: ${err}`);
+  console.log(`DB > CONNECTION ERROR: ${err.message}`);
 });
 
 //routes import
 const postRoutes = require("./routes/route_post");
 
 //middleware
+app.use(express.json());
 app.use(morgan("dev"));
 
 //routes
