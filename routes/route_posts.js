@@ -4,19 +4,20 @@ const router = express.Router();
 
 //controller
 //pri accessnuti "/" presmeruje na controller getPost v controller_getPost
-const postController = require("../controllers/controller_post");
+const postController = require("../controllers/controller_posts");
+const { requireLogin } = require("../controllers/controller_auth");
 
 //validator
 const postValidator = require("../validator/index");
 
 //routes a ich metody
-router.get("/post/get", postController.getPosts);
+router.get("/posts/get", postController.getPosts);
 
 //post (ktory vytvarame) musi prejst validaciou v metode "createPostValidator", az potom je presmerovany do controlleru
 //preto nepotrebujeme v controlleri checkovat error a pouzivame iba result, checkujeme ho uz vo validatore
 router.post(
-  "/post/create",
-  postValidator.createPostValidator,
+  "/posts/create",
+  [requireLogin, postValidator.createPostValidator],
   postController.createPost
 );
 

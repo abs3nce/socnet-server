@@ -23,12 +23,12 @@ mongoose.connection.on("error", (err) => {
 });
 
 //routes import
-const postRoutes = require("./routes/route_post");
+const postRoutes = require("./routes/route_posts");
 const authRoutes = require("./routes/route_auth");
 
 //middleware
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(expressValidator());
 app.use(morgan("dev"));
 
