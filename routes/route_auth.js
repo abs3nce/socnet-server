@@ -13,7 +13,9 @@ const authValidator = require("../validator/index");
 router.post(
   "/users/register",
   authValidator.userRegisterValidator,
-  authController.signupUser
+  authController.registerUser
 );
+
+router.post("/users/login", authController.loginUser);
 
 module.exports = router;

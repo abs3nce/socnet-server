@@ -44,6 +44,11 @@ userSchema
 
 //methods
 userSchema.methods = {
+  //navrati true ak sa rovnaju a false ak nie
+  authUser: function (plainPassword) {
+    return this.encryptPassword(plainPassword) == this.passwordHash;
+  },
+
   encryptPassword: function (password) {
     if (!password) return "";
     try {

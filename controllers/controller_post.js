@@ -1,7 +1,7 @@
 //models
 const Post = require("../models/model_post");
 
-exports.getPosts = (req, res, next) => {
+exports.getPosts = (req, res) => {
   const posts = Post.find()
     .then((posts) => {
       res.status(200).json({ posts: posts });
@@ -11,7 +11,7 @@ exports.getPosts = (req, res, next) => {
     });
 };
 
-exports.createPost = (req, res, next) => {
+exports.createPost = (req, res) => {
   const post = new Post(req.body);
   console.log(`API > CREATING POST: ${post}`);
 
