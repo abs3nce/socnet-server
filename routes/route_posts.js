@@ -6,6 +6,7 @@ const router = express.Router();
 //pri accessnuti "/" presmeruje na controller getPost v controller_getPost
 const postController = require("../controllers/controller_posts");
 const { requireLogin } = require("../controllers/controller_auth");
+const { userByID } = require("../controllers/controller_user");
 
 //validator
 const postValidator = require("../validator/index");
@@ -21,4 +22,13 @@ router.post(
   postController.createPost
 );
 
+//pokial je v URL niekde "userID" tak presmeruje na middleware a funkciu userByID
+router.param("userID", userByID);
+
 module.exports = router;
+
+
+
+
+
+//premenuj si tie files, je to confusing

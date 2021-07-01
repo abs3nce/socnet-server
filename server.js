@@ -26,7 +26,7 @@ mongoose.connection.on("error", (err) => {
 const postRoutes = require("./routes/route_posts");
 const authRoutes = require("./routes/route_auth");
 
-//middleware
+//base middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(expressValidator());
@@ -36,6 +36,15 @@ app.use(morgan("dev"));
 //funguju ako middleware, pri accessnuti "/" presmeruju na routes_post
 app.use("/", postRoutes);
 app.use("/", authRoutes);
+
+app.use(function (err, req, res, next) {
+  //funkcia express-jwt ktora handluje 'UnauthorizedError' a tak viem zmenit response json
+  if (err.name === "UnauthorizedError") {
+    res
+      .status(401)
+      .json({ error: "User must be logged in to perform this action" });
+  }
+});
 
 //port a express listening
 const port = process.env.PORT || 8080;

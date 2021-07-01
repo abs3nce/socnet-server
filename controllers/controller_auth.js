@@ -41,7 +41,7 @@ exports.loginUser = (req, res) => {
     //pokial bol user najdeny ale heslo bolo zle zadane (v authUser() v User modeli funkcii bolo returnute true) >> generovanie tokenu
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
-    //token sa spoji s cookie s menom token a nastavi sa mu expire 1 hodiny
+    //vytvorime cookie so zivotnostou jednej hodiny ktory v sebe drzi token uzivatela, bez neho nie je autorizovatelny
     res.cookie("token", token, { expire: new Date() + 3600 });
 
     //return usera s tokenom na FE
@@ -52,13 +52,16 @@ exports.loginUser = (req, res) => {
   });
 };
 
-exports.logoutUser = (req, res) => {
+exports.logoutUser = (req, res) => { //proste vymazeme cookie s menom token a tym padom odhlasime uzivatela
   res.clearCookie("token");
   res.status(200).json({ message: "User signed out" });
 };
 
-exports.requireLogin = expressJWT({
-  secret: process.env.JWT_SECRET,
-  algorithms: ["HS256"], // added later
+exports.requireLogin = expressJWT({ // funkcia zistuje ci sa v tokene nachadza spravny secret key z .env filu
+  secret: process.env.JWT_SECRET,   // ak ano tak uzivatela pusti dalej, ak nie tak ho zamietne
+  algorithms: ["HS256"], // definovane kvoli novej verzii express-jwt
+  //pokial je token validny >> expressJWT prida idcko overeneho usera do request objectu vo forme auth klucu
   userProperty: "auth",
+
 });
+
