@@ -1,4 +1,6 @@
-const User = require("../models/model_user");
+//obsahuje logiku ktorou sa bude riesit samotny user, co moze robit....
+
+const User = require("../schemes/scheme_user");
 
 exports.userByID = (req, res, next, id) => {
   User.findById(id).exec((err, user) => {

@@ -1,5 +1,7 @@
+//obsahuje logiku pre posty, get, vytvorenie....
+
 //models
-const Post = require("../models/model_post");
+const Post = require("../schemes/scheme_post");
 
 exports.getPosts = (req, res) => {
   const posts = Post.find()

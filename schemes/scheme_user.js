@@ -24,13 +24,14 @@ const userSchema = new mongoose.Schema({
   updated: Date,
 });
 
-//virtual field
+//virtual field - logicke zapisovacie pole, ktoreho obsah nezapiseme do DB, udaje sa daju nastavit automaticky podla prednastavenych hodnot alebo manualne
+//dobry priklad pouzitia je navratenie celeho mena, namiesto stavbar.prvemeno + stavbar.druhemeno vieme pouzit virtual a napisat stavbar.celemeno
 //dostaneme z klienta 'password' a nasledne ho ulozime ako "passwordHash" pricom 'password' je virtual pretoze sa nikde neuklada
 userSchema
   .virtual("password")
   .set(function (password) {
     //vytvorime temp var _password
-    this._password = password;
+    this._password = password; 
 
     //generovanie timestampu (saltu)
     this.salt = uuidv1();

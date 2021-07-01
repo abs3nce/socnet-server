@@ -1,7 +1,9 @@
+//obsahuje logiku ktorou sa bude riesit prihlasovanie uzivatela, registracia, odhlasovanie a veci okolo jeho uctu
+
 const jwt = require("jsonwebtoken");
 const expressJWT = require("express-jwt");
 require("dotenv").config();
-const User = require("../models/model_user");
+const User = require("../schemes/scheme_user");
 
 exports.registerUser = async (req, res) => {
   const userExists = await User.findOne({ username: req.body.username }); //najdi usera s username z FE
@@ -52,16 +54,16 @@ exports.loginUser = (req, res) => {
   });
 };
 
-exports.logoutUser = (req, res) => { //proste vymazeme cookie s menom token a tym padom odhlasime uzivatela
+exports.logoutUser = (req, res) => {
+  //proste vymazeme cookie s menom token a tym padom odhlasime uzivatela
   res.clearCookie("token");
   res.status(200).json({ message: "User signed out" });
 };
 
-exports.requireLogin = expressJWT({ // funkcia zistuje ci sa v tokene nachadza spravny secret key z .env filu
-  secret: process.env.JWT_SECRET,   // ak ano tak uzivatela pusti dalej, ak nie tak ho zamietne
+exports.requireLogin = expressJWT({
+  // funkcia zistuje ci sa v tokene nachadza spravny secret key z .env filu
+  secret: process.env.JWT_SECRET, // ak ano tak uzivatela pusti dalej, ak nie tak ho zamietne
   algorithms: ["HS256"], // definovane kvoli novej verzii express-jwt
   //pokial je token validny >> expressJWT prida idcko overeneho usera do request objectu vo forme auth klucu
   userProperty: "auth",
-
 });
-

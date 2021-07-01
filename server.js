@@ -24,7 +24,7 @@ mongoose.connection.on("error", (err) => {
 
 //routes import
 const postRoutes = require("./routes/route_posts");
-const authRoutes = require("./routes/route_auth");
+const authRoutes = require("./routes/route_account");
 
 //base middleware
 app.use(express.json());
