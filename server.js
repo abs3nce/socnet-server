@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 // const cors = require("cors");
 dotenv.config();
 
-//database
+//databaza - pripojenie a error handling
 mongoose
   .connect(process.env.DB_CONN, {
     useNewUrlParser: true,
@@ -25,6 +25,7 @@ mongoose.connection.on("error", (err) => {
 //routes import
 const postRoutes = require("./routes/route_posts");
 const authRoutes = require("./routes/route_account");
+const usersRoutes = require("./routes/route_users");
 
 //base middleware
 app.use(express.json());
@@ -36,9 +37,10 @@ app.use(morgan("dev"));
 //funguju ako middleware, pri accessnuti "/" presmeruju na routes_post
 app.use("/", postRoutes);
 app.use("/", authRoutes);
+app.use("/", usersRoutes);
 
+//funkcia express-jwt ktora handluje 'UnauthorizedError' a tak viem zmenit response json
 app.use(function (err, req, res, next) {
-  //funkcia express-jwt ktora handluje 'UnauthorizedError' a tak viem zmenit response json
   if (err.name === "UnauthorizedError") {
     res
       .status(401)

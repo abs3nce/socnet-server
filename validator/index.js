@@ -41,7 +41,9 @@ exports.userRegisterValidator = (req, res, next) => {
   req.check("password", "Password must not be empty").notEmpty();
   req
     .check("password", "Password's length must be at least 8 characters")
-    .isLength({ min: 8 });
+    .isLength({ min: 8 })
+    .matches(/\d/)
+    .withMessage("Password must contain at least 1 number");
 
   //check for error
   const errors = req.validationErrors();
