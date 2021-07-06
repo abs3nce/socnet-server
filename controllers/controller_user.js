@@ -23,6 +23,18 @@ exports.hasAuthorization = (req, res, next) => {
       .json({ error: "You are not authorized to perform this action" });
 };
 
+// exports.isOwnerOfAccount = (req, res, next) => {
+//   //overenie ci uzivatel, ktory sa snazi editnut/deletnut ucet je ownerom toho uctu
+
+//   //zisti aky uzivatel je prihlaseny
+//     //ak ziaden nie je prihlaseny >> zamietni request
+//     //ak je prihlaseny posun sa dalej
+
+//   //zisti koho ucet sa snazi tento uzivatel upravit vymazat
+//     //ak to nie je uzivatelov ucet tak to zamietni
+//     //ak je to uzivatelov ucet povol edit/delete
+// };
+
 exports.getAllUsers = (req, res, next) => {
   User.find((err, users) => {
     if (err) return res.status(500).json({ error: "Internal server error" });
@@ -60,6 +72,8 @@ exports.deleteUser = (req, res, next) => {
     if (err) return res.status(401).json({ error: "Internal server error" });
 
     console.log(`API > DELETING USER ${user.username}: ${user}`);
-    res.status(200).json({ message: `User ${user.username} has been deleted` });
+    res
+      .status(200)
+      .json({ message: `User ${user.username} has been deleted successfully` });
   });
 };
