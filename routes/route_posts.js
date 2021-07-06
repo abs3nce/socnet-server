@@ -17,12 +17,12 @@ router.get("/posts/get", postController.getPosts);
 //post (ktory vytvarame) musi prejst validaciou v metode "createPostValidator" vo validatore a samozrejme requireLogin v controller_account, az potom je presmerovany do controlleru
 //preto nepotrebujeme v controlleri checkovat error a pouzivame iba result, checkujeme ho uz vo validatore
 router.post(
-  "/posts/create",
-  [accountController.requireLogin, postValidator.createPostValidator],
-  postController.createPost
+  "/posts/create/:userid",
+  [accountController.requireLogin, postController.createPost],
+  postValidator.createPostValidator
 );
 
 //pokial je v URL niekde "userID" tak presmeruje na middleware a funkciu userByID
-router.param("userID", userController.userByID);
+router.param("userid", userController.userByID);
 
 module.exports = router;
