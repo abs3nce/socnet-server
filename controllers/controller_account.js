@@ -5,7 +5,7 @@ const expressJWT = require("express-jwt");
 require("dotenv").config();
 const User = require("../schemes/scheme_user");
 
-exports.registerUser = async (req, res) => {
+exports.registerUser = async (req, res, next) => {
   const userExists = await User.findOne({ username: req.body.username }); //najdi usera s username z FE
   if (userExists)
     //pokial tento user uz existuje tak zamietni registraciu
@@ -20,7 +20,7 @@ exports.registerUser = async (req, res) => {
   });
 };
 
-exports.loginUser = (req, res) => {
+exports.loginUser = (req, res, next) => {
   //najdenie usera na zaklade username
   const { _id, username, password } = req.body;
 
@@ -54,7 +54,7 @@ exports.loginUser = (req, res) => {
   });
 };
 
-exports.logoutUser = (req, res) => {
+exports.logoutUser = (req, res, next) => {
   //proste vymazeme cookie s menom token a tym padom odhlasime uzivatela
   res.clearCookie("token");
   res.status(200).json({ message: "User signed out" });

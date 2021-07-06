@@ -14,6 +14,17 @@ router.get(
   userController.getUser
 );
 
+router.put(
+  "/users/:userid",
+  accountController.requireLogin,
+  userController.updateUser
+);
+router.delete(
+  "/users/:userid",
+  accountController.requireLogin,
+  userController.deleteUser
+);
+
 //pokial je v URL niekde "userID" tak presmeruje na middleware a funkciu userByID
 router.param("userid", userController.userByID);
 

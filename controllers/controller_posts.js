@@ -3,7 +3,7 @@
 //models
 const Post = require("../schemes/scheme_post");
 
-exports.getPosts = (req, res) => {
+exports.getPosts = (req, res, next) => {
   const posts = Post.find()
     .then((posts) => {
       res.status(200).json({ posts: posts });
@@ -13,7 +13,7 @@ exports.getPosts = (req, res) => {
     });
 };
 
-exports.createPost = (req, res) => {
+exports.createPost = (req, res, next) => {
   const post = new Post(req.body);
   console.log(`API > CREATING POST: ${post}`);
 
