@@ -40,7 +40,7 @@ __________________________________________
 /login
 /register
 
-/posts/create/:userid
+/posts/create/:userid (x-www.form-urlencoded)
 __________________________________________
 
 

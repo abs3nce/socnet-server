@@ -23,17 +23,15 @@ exports.hasAuthorization = (req, res, next) => {
       .json({ error: "You are not authorized to perform this action" });
 };
 
-// exports.isOwnerOfAccount = (req, res, next) => {
-//   //overenie ci uzivatel, ktory sa snazi editnut/deletnut ucet je ownerom toho uctu
-
-//   //zisti aky uzivatel je prihlaseny
-//     //ak ziaden nie je prihlaseny >> zamietni request
-//     //ak je prihlaseny posun sa dalej
-
-//   //zisti koho ucet sa snazi tento uzivatel upravit vymazat
-//     //ak to nie je uzivatelov ucet tak to zamietni
-//     //ak je to uzivatelov ucet povol edit/delete
-// };
+exports.isOwnerOfAccount = (req, res, next) => {
+  let sameUser = req.profile && req.auth && req.profile._id == req.auth._id;
+  if (!sameUser) {
+    return res
+      .status(401)
+      .json({ error: "You are not authorized to perform this action" });
+  }
+  next();
+};
 
 exports.getAllUsers = (req, res, next) => {
   User.find((err, users) => {

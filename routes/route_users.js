@@ -16,12 +16,12 @@ router.get(
 
 router.put(
   "/users/:userid",
-  accountController.requireLogin,
+  [accountController.requireLogin, userController.isOwnerOfAccount],
   userController.updateUser
 );
 router.delete(
   "/users/:userid",
-  accountController.requireLogin,
+  [accountController.requireLogin, userController.isOwnerOfAccount],
   userController.deleteUser
 );
 
