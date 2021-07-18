@@ -7,6 +7,7 @@ const Post = require("../schemes/scheme_post");
 
 exports.getPosts = (req, res, next) => {
   const posts = Post.find()
+    .populate("postedBy", "_id username created")
     .then((posts) => {
       res.status(200).json({ posts: posts });
     })
@@ -15,13 +16,23 @@ exports.getPosts = (req, res, next) => {
     });
 };
 
+exports.getPostsByUser = (req, res, next) => {
+  Post.find({ postedBy: req.profile._id })
+    //populate pouzivame pretoze v Post scheme mame definovane ze hladame referenciu na User schemu, ak by to bolo opacne pouzili by sme .select
+    .populate("postedBy", "_id username")
+    .sort("_created")
+    .exec((err, posts) => {
+      if (err) return res.status(401).json({ error: err });
+      res.status(200).json({ posts: posts });
+    });
+};
+
 exports.createPost = (req, res, next) => {
-  let form = new formidable.IncomingForm(); //vytvor novy form 
+  let form = new formidable.IncomingForm(); //vytvor novy form
   form.keepExtensions = true; //uchovaj extensions
 
   //parsni form s udajmi z req a ak nasledne handleni callbacks
   form.parse(req, (err, fields, files) => {
-
     //handler pre error pri nahravani image
     if (err)
       return res.status(401).json({ error: "Image could not be uploaded" });
