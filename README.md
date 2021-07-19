@@ -10,6 +10,7 @@ GET
 /posts
 
 /users
+
 /users/:userid
 __________________________________________
 
@@ -17,6 +18,7 @@ POST
 
 
 /login
+
 /register
 
 /posts/:userid (x-www.form-urlencoded)
