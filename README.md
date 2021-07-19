@@ -1,5 +1,5 @@
 # socnet-server
-## Backend logic for my maturita project >> Social Network
+## Backend for my maturita project >> Social Network
 
 __________________________________________
 
