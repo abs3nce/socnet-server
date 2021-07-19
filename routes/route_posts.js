@@ -14,17 +14,27 @@ const postValidator = require("../validator/index");
 //stiahnutie vsetkych postov v DB
 router.get("/posts", postController.getPosts);
 
-router.get("/posts/author/:userid", postController.getPostsByUser);
+// router.get("/posts/author/:userid", postController.getPostsByUser);
+router.get("/posts/:userid", postController.getPostsByUser);
 
 //post (ktory vytvarame) musi prejst validaciou v metode "createPostValidator" vo validatore a samozrejme requireLogin v controller_account, az potom je presmerovany do controlleru
 //preto nepotrebujeme v controlleri checkovat error a pouzivame iba result, checkujeme ho uz vo validatore
 router.post(
-  "/posts/create/:userid",
+  "/posts/:userid",
   [accountController.requireLogin, postController.createPost],
   postValidator.createPostValidator
 );
 
+router.delete(
+  "/posts/:postid",
+  [accountController.requireLogin,postController.isOwnerOfPost],
+  postController.deletePost
+);
+
 //pokial je v URL niekde "userID" tak presmeruje na middleware a funkciu userByID
 router.param("userid", userController.userByID);
+
+//pokial je v URL niekde "postID" tak presmeruje na middleware a funkciu postByID
+router.param("postid", postController.postByID);
 
 module.exports = router;

@@ -62,8 +62,8 @@ exports.logoutUser = (req, res, next) => {
 
 exports.requireLogin = expressJWT({
   // funkcia zistuje ci sa v tokene nachadza spravny secret key z .env filu
+  userProperty: "auth",
   secret: process.env.JWT_SECRET, // ak ano tak uzivatela pusti dalej, ak nie tak ho zamietne
   algorithms: ["HS256"], // definovane kvoli novej verzii express-jwt
   //pokial je token validny >> expressJWT prida idcko overeneho usera do request objectu vo forme auth klucu
-  userProperty: "auth",
 });
