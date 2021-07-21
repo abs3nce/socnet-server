@@ -7,7 +7,7 @@ const dotenv = require("dotenv");
 const expressValidator = require("express-validator");
 const cookieParser = require("cookie-parser");
 const fs = require("fs");
-// const cors = require("cors");
+const cors = require("cors");
 dotenv.config();
 
 //databaza - pripojenie a error handling
@@ -29,6 +29,7 @@ const authRoutes = require("./routes/route_account");
 const usersRoutes = require("./routes/route_users");
 
 //base middleware
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(expressValidator());
