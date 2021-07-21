@@ -25,9 +25,15 @@ router.post(
   postValidator.createPostValidator
 );
 
+router.put(
+  "/posts/:postid",
+  [accountController.requireLogin, postController.isOwnerOfPost],
+  postController.updatePost
+);
+
 router.delete(
   "/posts/:postid",
-  [accountController.requireLogin,postController.isOwnerOfPost],
+  [accountController.requireLogin, postController.isOwnerOfPost],
   postController.deletePost
 );
 

@@ -1,9 +1,12 @@
-//obsahuje logiku pre posty, get, vytvorenie....
+//obsahuje logiku pre posty, getovanie, vytvorenie....
+
+const _ = require("lodash");
 const formidable = require("formidable");
 const fs = require("fs");
 
 //models
 const Post = require("../schemes/scheme_post");
+const { post } = require("../routes/route_posts");
 
 //middleware, podla postID sa prida dany post do req objektu ako .post
 exports.postByID = (req, res, next, id) => {
@@ -44,7 +47,7 @@ exports.getPostsByUser = (req, res, next) => {
     .populate("postedBy", "_id username")
     .sort("_created")
     .exec((err, posts) => {
-      if (err) return res.status(401).json({ error: err });
+      if (err) return res.status(500).json({ error: err });
       res.status(200).json({ posts: posts });
     });
 };
@@ -81,10 +84,20 @@ exports.createPost = (req, res, next) => {
   });
 };
 
+exports.updatePost = (req, res, next) => {
+  let post = req.post;
+  post = _.extend(post, req.body); // rozsitenie post objektu o info z req objektu
+  post.updated = Date.now();
+  post.save((err, post) => {
+    if (err) return res.status(500).json({ error: err });
+    res.status(200).json({ post: post });
+  });
+};
+
 exports.deletePost = (req, res, next) => {
   let post = req.post;
   post.remove((err, post) => {
-    if (err) return res.status(401).json({ error: err });
+    if (err) return res.status(500).json({ error: err });
     res.status(200).json({ message: "Post has been deleted successfully" });
   });
 };
