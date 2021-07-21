@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const expressValidator = require("express-validator");
 const cookieParser = require("cookie-parser");
+const fs = require("fs");
 // const cors = require("cors");
 dotenv.config();
 
@@ -38,6 +39,17 @@ app.use(morgan("dev"));
 app.use("/", postRoutes);
 app.use("/", authRoutes);
 app.use("/", usersRoutes);
+
+//dokumentacia
+app.get("/", (req, res, next) => {
+  fs.readFile("docs/apidocs.json", (err, data) => {
+    if (err) {
+      res.status(500).json({ error: err });
+    }
+    const docs = JSON.parse(data);
+    res.status(200).json(docs);
+  });
+});
 
 //funkcia express-jwt ktora handluje 'UnauthorizedError' a tak viem zmenit response json
 app.use(function (err, req, res, next) {

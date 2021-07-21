@@ -1,0 +1,23 @@
+{
+  "GET": {
+    
+    "/": "API DOCUMENTATION",
+    "logout": "LOGOUT USER",
+    "/posts": "RETURN LIST OF ALL POSTS IN DATABASE",
+    "/users": "RETURN LIST OF ALL REGISTERED USERS",
+    "/users/:userid": "RETURN LIST OF ALL POSTS CREATED BY USER WITH ID OF userid"
+  },
+  "POST": {
+    "/login": "LOGIN USER WITH username AND password PARAMETERS, RETURNS TOKEN",
+    "/register": "REGISTER USER WITH username AND password PARAMETERS",
+    "/posts/:userid": "CREATE POST BY USER WITH ID OF userid"
+  },
+  "PUT": {
+    "/posts/:postid": "EDIT POST",
+    "/users/:userid": "EDIT USER PROFILE"
+  },
+  "DELETE": {
+    "/posts/:postid": "DELETE POST",
+    "/users/:userid": "DELETE USER PROFILE"
+  }
+}
