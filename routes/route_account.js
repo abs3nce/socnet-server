@@ -1,4 +1,4 @@
-//base
+//base packages import
 const express = require("express");
 const router = express.Router();
 
@@ -6,13 +6,13 @@ const router = express.Router();
 const accountController = require("../controllers/controller_account");
 const userController = require("../controllers/controller_user");
 
-//validator udajov (obsah, velkost obsahu, kriteria)
+//validator
 const accountValidator = require("../validator/index");
 
 //routes a ich validacie
 
 //ak je accessnute /register, request prejde cez validator, aby sa zistilo ci data davaju zmysel podla nastavenych kriterii
-//a iba ak vsetko vyhovuje a nenastanie ziaden error az potom su presmerovane do funkcie registerUser v controlleri accountu
+//a iba ak vsetko vyhovuje a nenastanie ziaden error az potom su presmerovane do funkcie registerUser v accountControlleri
 router.post(
   "/register",
   accountValidator.userRegisterValidator,

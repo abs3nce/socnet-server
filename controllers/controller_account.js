@@ -13,6 +13,7 @@ exports.registerUser = async (req, res, next) => {
 
   const user = await new User(req.body); //pokial tento user neexistoval >> vytvor novy instance Usera s udajmi z FE
   await user.save(); //uloz ho do DB a na FE posli response s udajmi
+
   console.log(`API > SAVING USER TO DB: ${user}`);
   res.status(200).json({
     user: { username: user.username, _id: user._id, created: user.created },
@@ -24,7 +25,7 @@ exports.loginUser = (req, res, next) => {
   //najdenie usera na zaklade username
   const { _id, username, password } = req.body;
 
-  User.findOne({ username: req.body.username }, (err, user) => {
+  User.findOne({ username: username }, (err, user) => {
     //pokial nastali nejake errory
     if (err) return res.status(500).json({ error: "Internal server error" });
 
@@ -34,23 +35,23 @@ exports.loginUser = (req, res, next) => {
         .status(401)
         .json({ error: "Invalid credentials, please try again" });
     }
-    //pokial bol user najdeny ale heslo bolo zle zadane (v authUser() v user modeli funkcii bolo returnute false) >> zamietnutie
+    //pokial bol user najdeny ale heslo bolo zle zadane (v authUser() metode User schemy bolo returnute false) >> zamietnutie
     if (!user.authUser(password)) {
       return res
         .status(401)
         .json({ error: "Invalid credentials, please try again" });
     }
-    //pokial bol user najdeny ale heslo bolo zle zadane (v authUser() v User modeli funkcii bolo returnute true) >> generovanie tokenu
+    //pokial bol user najdeny ale heslo bolo spravne zadane (v authUser() v User modeli funkcii bolo returnute true) >> generovanie tokenu
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
-    //vytvorime cookie so zivotnostou jednej hodiny ktory v sebe drzi token uzivatela, bez neho nie je autorizovatelny
+    //vytvorime cookie so zivotnostou jednej hodiny ktory v sebe drzi token uzivatela, bez neho nie je autorizovatelny, toto bude pouzite ako nutnost sa relohnut po nejakom case
     res.cookie("token", token, { expire: new Date() + 3600 });
 
     //return usera s tokenom na FE
     console.log(`API > USER ${user.username} LOGGED IN:`, user, { token });
     return res
       .status(200)
-      .json({ token, user: { username: user.username, _id: user._id } });
+      .json({ user: { username: user.username, _id: user._id, token: token } });
   });
 };
 

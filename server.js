@@ -1,4 +1,4 @@
-//package
+//base packages import
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
@@ -10,7 +10,7 @@ const fs = require("fs");
 const cors = require("cors");
 dotenv.config();
 
-//databaza - pripojenie a error handling
+//databaza
 mongoose
   .connect(process.env.DB_CONN, {
     useNewUrlParser: true,
@@ -19,11 +19,12 @@ mongoose
   .then(() => {
     console.log(`DB > CONNECTION SUCCESSFUL`);
   });
+
 mongoose.connection.on("error", (err) => {
   console.log(`DB > CONNECTION ERROR: ${err.message}`);
 });
 
-//routes import
+//import custom routes
 const postRoutes = require("./routes/route_posts");
 const authRoutes = require("./routes/route_account");
 const usersRoutes = require("./routes/route_users");
@@ -36,12 +37,12 @@ app.use(expressValidator());
 app.use(morgan("dev"));
 
 //routes
-//funguju ako middleware, pri accessnuti "/" presmeruju na routes_post
+//pouzite ako middleware, pri accessnuti "/" presmeruju na spravny route podla url (vsetko v subore routes)
 app.use("/", postRoutes);
 app.use("/", authRoutes);
 app.use("/", usersRoutes);
 
-//dokumentacia
+//dokumentacia API na "/" route
 app.get("/", (req, res, next) => {
   fs.readFile("docs/apidocs.json", (err, data) => {
     if (err) {
@@ -52,7 +53,8 @@ app.get("/", (req, res, next) => {
   });
 });
 
-//funkcia express-jwt ktora handluje 'UnauthorizedError' a tak viem zmenit response json
+//funkcia express-jwt ktora handluje (kazdy) 'UnauthorizedError'
+//podla nej menim response json
 app.use(function (err, req, res, next) {
   if (err.name === "UnauthorizedError") {
     res
@@ -61,7 +63,7 @@ app.use(function (err, req, res, next) {
   }
 });
 
-//port a express listening
+//listening serveru na porte
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
   console.log(`API > LISTENING ON PORT: ${port}`);

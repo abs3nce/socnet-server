@@ -55,20 +55,47 @@ exports.getPostsByUser = (req, res, next) => {
 exports.createPost = (req, res, next) => {
   let form = new formidable.IncomingForm(); //vytvor novy form
   form.keepExtensions = true; //uchovaj extensions
-
   //parsni form s udajmi z req a ak nasledne handleni callbacks
   form.parse(req, (err, fields, files) => {
     //handler pre error pri nahravani image
     if (err)
-      return res.status(401).json({ error: "Image could not be uploaded" });
+      return res.status(500).json({ error: "Image could not be uploaded" });
 
-    let post = new Post(fields); //vytvorenie postu schemy Post s udajmi z fieldov z FE
+    let post = new Post(fields); //vytvorenie postu podla schemy Post s udajmi z fieldov z FE
 
-    post.postedBy = req.profile; //nastavenie ownera postu bez saltu a hashu
+    post.postedBy = req.profile; //vymazanie passwordHashu a saltu z udajov o poste
     post.postedBy.passwordHash = undefined;
     post.postedBy.salt = undefined;
 
+    // -----------------------------------------------------------------------------
+    // provizorna validacia udajov z inputu formu
+    const { title, body, categories, tags } = fields;
+
+    if (!title || !title.length) {
+      return res.status(401).json({ error: "Title must not be empty" });
+    }
+
+    if (title.length < 8 || title.length > 150) {
+      return res.status(401).json({
+        error: "The title's length must be between 8 to 150 characters",
+      });
+    }
+
+    if (body.length > 1500) {
+      return res
+        .status(401)
+        .json({ error: "The maximum length of body is 1500 characters" });
+    }
+
     if (files.image) {
+      //validacia velkosti image
+      if (files.image.size > 10000000) {
+        return res
+          .status(401)
+          .json({ error: "Maximal size of an image is 10 MB" });
+      }
+      // -----------------------------------------------------------------------------
+
       //handling suborov z FE pomocou fska
       post.image.data = fs.readFileSync(files.image.path);
       post.image.contentType = files.image.type;

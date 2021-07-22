@@ -33,8 +33,7 @@
 
 1. 
 
-Kazdy user ktory sa prihlasi moze editovat a vymazavat ucty ostatnym userom >> treba urobit nejaky typ validatoru na
-zistovanie ktory uzivatel je prihlaseny a zamedzit tieto funkcie pokial ucet ktory sa snazi upravovat nie je jeho
+Post validator je broken, treba vymysliet ako budem kontrolovat data vo x-www-form-urlencoded formate pretoze doteraz fungoval kedze sme passovali raw json data
 
 2. 
 

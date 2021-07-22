@@ -1,4 +1,4 @@
-//base
+//base packages import
 const express = require("express");
 const router = express.Router();
 
@@ -6,19 +6,26 @@ const router = express.Router();
 const userController = require("../controllers/controller_user");
 const accountController = require("../controllers/controller_account");
 
-//routes a ich validacie
+// R O U T E S
+//navratenie vsetkych registrovanych uzivatelov
 router.get("/users", userController.getAllUsers);
+
+//navratenie urciteho usera so zadanym userid
 router.get(
   "/users/:userid",
-  /*accountController.requireLogin,*/
   userController.getUser
 );
 
+//upravenie profilu a udajov usera pomocou targetnutia jeho id
+//samozrejme moze iba prihlaseny owner
 router.put(
   "/users/:userid",
   [accountController.requireLogin, userController.isOwnerOfAccount],
   userController.updateUser
 );
+
+//vymazanie profilu usera pomocou targetnutia jeho id
+//samozrejme moze iba prihlaseny owner
 router.delete(
   "/users/:userid",
   [accountController.requireLogin, userController.isOwnerOfAccount],
