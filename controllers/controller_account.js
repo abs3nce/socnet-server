@@ -1,5 +1,4 @@
 //obsahuje logiku ktorou sa bude riesit prihlasovanie uzivatela, registracia, odhlasovanie a veci okolo jeho uctu
-
 const jwt = require("jsonwebtoken");
 const expressJWT = require("express-jwt");
 require("dotenv").config();

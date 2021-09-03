@@ -6,15 +6,14 @@ const User = require("../schemes/scheme_user");
 exports.userByID = (req, res, next, id) => {
   User.findById(id).exec((err, user) => {
     if (err) return res.status(500).json({ error: "Internal server error" });
-
-    if (!user) return res.status(401).json({ error: "User not found" });
-
-    req.profile = user; // pridanie profile objektu s informaciami o userovi do request objektu
+    if (!user) return res.status(401).json({ error: "User not found" });    
+    req.profile = user; // pridanie informacii o userovi do req.profile
     next();
   });
 };
 
 exports.isOwnerOfAccount = (req, res, next) => {
+  //pokial existuje v req objekte .profile, .auth a pokial sa .profile._id rovna .auth._id tak sameUser = true
   let sameUser = req.profile && req.auth && req.profile._id == req.auth._id;
   if (!sameUser) {
     return res
@@ -32,7 +31,9 @@ exports.getAllUsers = (req, res, next) => {
 };
 
 exports.getUser = (req, res, next) => {
-  req.profile.salt = undefined;
+  // z req.profile objectu ktory bol pridany v userById() sa vytiahne dany user
+  // plus sa vymaze salt a passwordHash kvoli bezpecnosti
+  req.profile.salt = undefined; 
   req.profile.passwordHash = undefined;
   return res.status(200).json(req.profile);
 };

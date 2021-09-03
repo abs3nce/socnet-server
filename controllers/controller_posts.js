@@ -21,7 +21,6 @@ exports.postByID = (req, res, next, id) => {
 
 exports.isOwnerOfPost = (req, res, next) => {
   let isOwner = req.post && req.auth && req.post.postedBy._id == req.auth._id;
-
   if (!isOwner) {
     return res
       .status(401)
