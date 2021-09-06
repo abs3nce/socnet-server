@@ -2,13 +2,17 @@ exports.userRegisterValidator = (req, res, next) => {
   //validator for username
   req.check("username", "Username must not be empty").notEmpty();
   req
-    .check("username", "Username's length must be between 3 to 25 characters")
+    .check("username", "Length of username must be between 3 to 25 characters")
     .isLength({ min: 3, max: 25 });
+
+  //validator for email
+  req.check("email", "Email must not be empty").notEmpty();
+  req.check("email").isEmail().withMessage("Invalid form of email");
 
   //validator for password
   req.check("password", "Password must not be empty").notEmpty();
   req
-    .check("password", "Password's length must be at least 8 characters")
+    .check("password", "Length of password must be at least 8 characters")
     .isLength({ min: 8 })
     .matches(/\d/)
     //matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, "i"); mozno na test kebyze rovno uzivatela oboznamim s kriteriami na heslo
@@ -29,7 +33,7 @@ exports.userRegisterValidator = (req, res, next) => {
 // exports.createPostValidator = (req, res, next) => {
 //   // tento validator uz nefunguje kedze na vytvorenie
 //   // postu pouzivame x-www-formurlencoded data a tento validator vie pracovat
-//   // iba s json datami, cize treba vymysliet nejaku nahradu
+//   // iba s raw json datami, cize treba vymysliet nejaku nahradu
 
 //   //validator for post title
 //   //ak je empty hod error "Create a title"

@@ -5,22 +5,24 @@ const router = express.Router();
 //controllers
 const userController = require("../controllers/controller_user");
 const accountController = require("../controllers/controller_account");
+const accountValidator = require("../validator/index");
 
 // R O U T E S
 //navratenie vsetkych registrovanych uzivatelov
 router.get("/users", userController.getAllUsers);
 
 //navratenie urciteho usera so zadanym userid
-router.get(
-  "/users/:userid",
-  userController.getUser
-);
+router.get("/users/:userid", userController.getUser);
 
 //upravenie profilu a udajov usera pomocou targetnutia jeho id
 //samozrejme moze iba prihlaseny owner
 router.put(
   "/users/:userid",
-  [accountController.requireLogin, userController.isOwnerOfAccount],
+  [
+    accountController.requireLogin,
+    userController.isOwnerOfAccount,
+    accountValidator.userRegisterValidator,
+  ],
   userController.updateUser
 );
 

@@ -5,17 +5,27 @@ require("dotenv").config();
 const User = require("../schemes/scheme_user");
 
 exports.registerUser = async (req, res, next) => {
-  const userExists = await User.findOne({ username: req.body.username }); //najdi usera s username z FE
-  if (userExists)
-    //pokial tento user uz existuje tak zamietni registraciu
-    return res.status(401).json({ error: "Username already exists" });
+  //checkni pre duplikovany ucet
+  //pokial tento user uz existuje tak zamietni registraciu
+  usernameExists = await User.findOne({ username: req.body.username });
+  if (usernameExists)
+    return res.status(401).json({ error: "Username already in use" });
+
+  emailExists = await User.findOne({ email: req.body.email });
+  if (emailExists)
+    return res.status(401).json({ error: "Email already in use" });
 
   const user = await new User(req.body); //pokial tento user neexistoval >> vytvor novy instance Usera s udajmi z FE
   await user.save(); //uloz ho do DB a na FE posli response s udajmi
 
   console.log(`API > SAVING USER TO DB: ${user}`);
   res.status(200).json({
-    user: { username: user.username, _id: user._id, created: user.created },
+    user: {
+      username: user.username,
+      email: user.email,
+      _id: user._id,
+      created: user.created,
+    },
     message: "Registration successful",
   });
 };

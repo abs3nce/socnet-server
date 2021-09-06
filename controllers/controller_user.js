@@ -27,7 +27,7 @@ exports.getAllUsers = (req, res, next) => {
   User.find((err, users) => {
     if (err) return res.status(500).json({ error: "Internal server error" });
     res.status(200).json({ users: users });
-  }).select("username _id updated created");
+  }).select("username email _id updated created");
 };
 
 exports.getUser = (req, res, next) => {
