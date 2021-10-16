@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema({
   },
 
   updated: Date,
+
+  profilePicture: {
+    data: Buffer,
+    contentType: String,
+  },
 });
 
 //virtual field - logicke zapisovacie pole, ktoreho obsah nezapiseme do DB, udaje sa daju nastavit automaticky podla prednastavenych hodnot alebo manualne

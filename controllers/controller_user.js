@@ -1,5 +1,7 @@
 //obsahuje logiku ktorou sa bude riesit samotny user, co moze robit....
 const _ = require("lodash");
+const formidable = require("formidable");
+const fs = require("fs");
 
 const User = require("../schemes/scheme_user");
 
@@ -38,20 +40,46 @@ exports.getUser = (req, res, next) => {
   return res.status(200).json(req.profile);
 };
 
-exports.updateUser = (req, res, next) => {
-  let user = req.profile;
+// exports.updateUser = (req, res, next) => {
+//   let user = req.profile;
 
-  user = _.extend(user, req.body); //prepisuje povodny objekt usera infomaciami v req.body >> ak nam pride novy username tak ho prepise v user objekte
-  user.updated = Date.now();
-  user.save((err) => {
-    if (err) {
-      return res
-        .status(401)
-        .json({ error: "You are not authorized to perform this action" });
+//   user = _.extend(user, req.body); //prepisuje povodny objekt usera infomaciami v req.body >> ak nam pride novy username tak ho prepise v user objekte
+//   user.updated = Date.now();
+//   user.save((err) => {
+//     if (err) {
+//       return res
+//         .status(401)
+//         .json({ error: "You are not authorized to perform this action" });
+//     }
+//     user.salt = undefined; //odstranenie saltu a hashu pretoze user sa bude preposielat na FE
+//     user.passwordHash = undefined;
+//     res.status(200).json({ user: user });
+//   });
+// };
+
+exports.updateUser = (req, res, next) => {
+  let form = new formidable.IncomingForm();
+  form.keepExtensions = true;
+  form.parse(req, (err, fields, files) => {
+    //chceme spracovat form fields a aj pripadne uploadovane images
+    if (err)
+      return res.status(500).json({ error: "Photo could not be uploaded" });
+    let user = req.profile;
+    user = _.extend(user, fields); //nahranie novych udajov do user objektu
+    user.updated = Date.now();
+
+    if (files.profilePicture) {
+      user.profilePicture.data = fs.readFileSync(files.profilePicture.path);
+      user.profilePicture.contentType = files.profilePicture.type;
     }
-    user.salt = undefined; //odstranenie saltu a hashu pretoze user sa bude preposielat na FE
-    user.passwordHash = undefined;
-    res.status(200).json({ user: user });
+
+    user.save((err, result) => {
+      if (err) return res.status(500).json({ error: err });
+
+      user.salt = undefined; //odstranenie saltu a hashu pretoze user sa bude preposielat na FE
+      user.passwordHash = undefined;
+      res.status(200).json(user);
+    });
   });
 };
 
