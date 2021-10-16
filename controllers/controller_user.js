@@ -40,6 +40,14 @@ exports.getUser = (req, res, next) => {
   return res.status(200).json(req.profile);
 };
 
+exports.getUserProfilePicture = (req, res, next) => {
+  if (req.profile.profilePicture.data) {
+    res.set("Content-Type", req.profile.profilePicture.contentType);
+    return res.send(req.profile.profilePicture.data);
+  }
+  next();
+};
+
 // exports.updateUser = (req, res, next) => {
 //   let user = req.profile;
 

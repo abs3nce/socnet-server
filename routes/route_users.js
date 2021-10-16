@@ -14,6 +14,9 @@ router.get("/users", userController.getAllUsers);
 //navratenie urciteho usera so zadanym userid
 router.get("/users/:userid", userController.getUser);
 
+//navratenie profilePicture uzivatela
+router.get("/users/pfp/:userid", userController.getUserProfilePicture)
+
 //upravenie profilu a udajov usera pomocou targetnutia jeho id
 //samozrejme moze iba prihlaseny owner
 router.put(
