@@ -60,7 +60,10 @@ exports.loginUser = (req, res, next) => {
     console.log(`API > USER ${user.username} LOGGED IN:`, user, { token });
     return res
       .status(200)
-      .json({ token: token, user: { username: user.username, _id: user._id } });
+      .json({
+        token: token,
+        user: { username: user.username, email: user.email, _id: user._id },
+      });
   });
 };
 

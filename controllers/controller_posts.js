@@ -6,7 +6,6 @@ const fs = require("fs");
 
 //models
 const Post = require("../schemes/scheme_post");
-const { post } = require("../routes/route_posts");
 
 //middleware, podla postID sa prida dany post do req objektu ako .post
 exports.postByID = (req, res, next, id) => {

@@ -6,7 +6,7 @@ const User = require("../schemes/scheme_user");
 exports.userByID = (req, res, next, id) => {
   User.findById(id).exec((err, user) => {
     if (err) return res.status(500).json({ error: "Internal server error" });
-    if (!user) return res.status(401).json({ error: "User not found" });    
+    if (!user) return res.status(401).json({ error: "User not found" });
     req.profile = user; // pridanie informacii o userovi do req.profile
     next();
   });
@@ -26,14 +26,14 @@ exports.isOwnerOfAccount = (req, res, next) => {
 exports.getAllUsers = (req, res, next) => {
   User.find((err, users) => {
     if (err) return res.status(500).json({ error: "Internal server error" });
-    res.status(200).json({ users: users });
+    res.json(users);
   }).select("username email _id updated created");
 };
 
 exports.getUser = (req, res, next) => {
   // z req.profile objectu ktory bol pridany v userById() sa vytiahne dany user
   // plus sa vymaze salt a passwordHash kvoli bezpecnosti
-  req.profile.salt = undefined; 
+  req.profile.salt = undefined;
   req.profile.passwordHash = undefined;
   return res.status(200).json(req.profile);
 };
