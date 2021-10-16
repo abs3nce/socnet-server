@@ -2,7 +2,7 @@ exports.userRegisterValidator = (req, res, next) => {
   //validator for username
   req.check("username", "Username must not be empty").notEmpty();
   req
-    .check("username", "Length of username must be between 3 to 25 characters")
+    .check("username", "Length of the username must be between 3 to 25 characters")
     .isLength({ min: 3, max: 25 });
 
   //validator for email
@@ -12,7 +12,7 @@ exports.userRegisterValidator = (req, res, next) => {
   //validator for password
   req.check("password", "Password must not be empty").notEmpty();
   req
-    .check("password", "Length of password must be at least 8 characters")
+    .check("password", "Password must be at lease 8 characters long")
     .isLength({ min: 8 })
     .matches(/\d/)
     //matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, "i"); mozno na test kebyze rovno uzivatela oboznamim s kriteriami na heslo

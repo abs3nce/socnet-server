@@ -21,7 +21,6 @@ router.put(
   [
     accountController.requireLogin,
     userController.isOwnerOfAccount,
-    accountValidator.userRegisterValidator,
   ],
   userController.updateUser
 );
