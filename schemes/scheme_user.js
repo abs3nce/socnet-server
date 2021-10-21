@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 
+  description: {
+    type: String,
+    trim: true,
+  },
+
   salt: String,
 
   created: {
