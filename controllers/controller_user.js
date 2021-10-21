@@ -6,12 +6,16 @@ const fs = require("fs");
 const User = require("../schemes/scheme_user");
 
 exports.userByID = (req, res, next, id) => {
-  User.findById(id).exec((err, user) => {
-    if (err) return res.status(500).json({ error: "Internal server error" });
-    if (!user) return res.status(401).json({ error: "User not found" });
-    req.profile = user; // pridanie informacii o userovi do req.profile
-    next();
-  });
+  User.findById(id)
+    //naplnenie followers a following arrayu Usera
+    .populate("following", "_id name")
+    .populate("followers", "_id name")
+    .exec((err, user) => {
+      if (err) return res.status(500).json({ error: "Internal server error" });
+      if (!user) return res.status(401).json({ error: "User not found" });
+      req.profile = user; // pridanie informacii o userovi do req.profile
+      next();
+    });
 };
 
 exports.isOwnerOfAccount = (req, res, next) => {
@@ -47,23 +51,6 @@ exports.getUserProfilePicture = (req, res, next) => {
   }
   next();
 };
-
-// exports.updateUser = (req, res, next) => {
-//   let user = req.profile;
-
-//   user = _.extend(user, req.body); //prepisuje povodny objekt usera infomaciami v req.body >> ak nam pride novy username tak ho prepise v user objekte
-//   user.updated = Date.now();
-//   user.save((err) => {
-//     if (err) {
-//       return res
-//         .status(401)
-//         .json({ error: "You are not authorized to perform this action" });
-//     }
-//     user.salt = undefined; //odstranenie saltu a hashu pretoze user sa bude preposielat na FE
-//     user.passwordHash = undefined;
-//     res.status(200).json({ user: user });
-//   });
-// };
 
 exports.updateUser = (req, res, next) => {
   let form = new formidable.IncomingForm();
@@ -102,4 +89,70 @@ exports.deleteUser = (req, res, next) => {
       .status(200)
       .json({ message: `User ${user.username} has been deleted successfully` });
   });
+};
+
+exports.addFollowing = (req, res, next) => {
+  User.findByIdAndUpdate(
+    req.body.userID,
+    //prida uzivatela do "following" arrayu >> uzivatel sa stava sledovatelom
+    { $push: { following: req.body.followID } },
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: err });
+      }
+      next();
+    }
+  );
+};
+
+exports.addFollower = (req, res) => {
+  User.findByIdAndUpdate(
+    req.body.followID,
+    //prida uzivatela do followers listu >> uzivatel je sledovany
+    { $push: { followers: req.body.userID } },
+    { new: true } //mongodb nam bude navracat iba nove udaje
+  )
+    .populate("following", "_id name")
+    .populate("followers", "_id name")
+    .exec((err, result) => {
+      if (err) {
+        return res.status(500).json({ error: err });
+      }
+      result.passwordHash = undefined;
+      result.salt = undefined;
+      res.json(result);
+    });
+};
+
+exports.removeFollowing = (req, res, next) => {
+  User.findByIdAndUpdate(
+    req.body.userID,
+    //prida uzivatela do "following" arrayu >> uzivatel sa stava sledovatelom
+    { $pull: { following: req.body.unfollowID } },
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: err });
+      }
+      next();
+    }
+  );
+};
+
+exports.removeFollower = (req, res) => {
+  User.findByIdAndUpdate(
+    req.body.unfollowID,
+    //prida uzivatela do followers listu >> uzivatel je sledovany
+    { $pull: { followers: req.body.userID } },
+    { new: true } //mongodb nam bude navracat iba nove udaje
+  )
+    .populate("following", "_id name")
+    .populate("followers", "_id name")
+    .exec((err, result) => {
+      if (err) {
+        return res.status(500).json({ error: err });
+      }
+      result.passwordHash = undefined;
+      result.salt = undefined;
+      res.json(result);
+    });
 };

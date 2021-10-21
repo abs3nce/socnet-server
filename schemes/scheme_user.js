@@ -2,6 +2,7 @@
 const mongoose = require("mongoose");
 const { v1: uuidv1 } = require("uuid");
 const crypto = require("crypto");
+const { ObjectId } = mongoose.Schema;
 
 //vytvorenie noveho modelu pre usera
 const userSchema = new mongoose.Schema({
@@ -18,17 +19,19 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
 
-  passwordHash: {
-    type: String,
-    required: true,
-  },
-
   description: {
     type: String,
     trim: true,
   },
 
-  salt: String,
+  profilePicture: {
+    data: Buffer,
+    contentType: String,
+  },
+
+  following: [{ type: ObjectId, ref: "User" }],
+
+  followers: [{ type: ObjectId, ref: "User" }],
 
   created: {
     type: Date,
@@ -37,10 +40,12 @@ const userSchema = new mongoose.Schema({
 
   updated: Date,
 
-  profilePicture: {
-    data: Buffer,
-    contentType: String,
+  passwordHash: {
+    type: String,
+    required: true,
   },
+
+  salt: String,
 });
 
 //virtual field - logicke zapisovacie pole, ktoreho obsah nezapiseme do DB, udaje sa daju nastavit automaticky podla prednastavenych hodnot alebo manualne

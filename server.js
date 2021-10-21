@@ -24,6 +24,11 @@ mongoose.connection.on("error", (err) => {
   console.log(`DB > CONNECTION ERROR: ${err.message}`);
 });
 
+//deprication fix
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+
 //import custom routes
 const postRoutes = require("./routes/route_posts");
 const authRoutes = require("./routes/route_account");

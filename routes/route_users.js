@@ -5,7 +5,6 @@ const router = express.Router();
 //controllers
 const userController = require("../controllers/controller_user");
 const accountController = require("../controllers/controller_account");
-const accountValidator = require("../validator/index");
 
 // R O U T E S
 //navratenie vsetkych registrovanych uzivatelov
@@ -15,17 +14,28 @@ router.get("/users", userController.getAllUsers);
 router.get("/users/:userid", userController.getUser);
 
 //navratenie profilePicture uzivatela
-router.get("/users/pfp/:userid", userController.getUserProfilePicture)
+router.get("/users/pfp/:userid", userController.getUserProfilePicture);
 
 //upravenie profilu a udajov usera pomocou targetnutia jeho id
 //samozrejme moze iba prihlaseny owner
 router.put(
   "/users/:userid",
-  [
-    accountController.requireLogin,
-    userController.isOwnerOfAccount,
-  ],
+  [accountController.requireLogin, userController.isOwnerOfAccount],
   userController.updateUser
+);
+
+router.put(
+  "/users/follow",
+  [accountController.requireLogin],
+  userController.addFollowing,
+  userController.addFollower
+);
+
+router.put(
+  "/users/unfollow",
+  [accountController.requireLogin],
+  userController.removeFollowing,
+  userController.removeFollower
 );
 
 //vymazanie profilu usera pomocou targetnutia jeho id
