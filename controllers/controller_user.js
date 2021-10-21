@@ -8,8 +8,8 @@ const User = require("../schemes/scheme_user");
 exports.userByID = (req, res, next, id) => {
     User.findById(id)
         //naplnenie followers a following arrayu Usera
-        .populate("following", "_id name")
-        .populate("followers", "_id name")
+        .populate("following", "_id username")
+        .populate("followers", "_id username") //pridat podla potreby
         .exec((err, user) => {
             if (err)
                 return res.status(500).json({ error: "Internal server error" });
@@ -119,8 +119,8 @@ exports.addFollower = (req, res) => {
         { $push: { followers: req.body.userID } },
         { new: true } //mongodb nam bude navracat iba nove udaje
     )
-        .populate("following", "_id name")
-        .populate("followers", "_id name")
+        .populate("following", "_id username")
+        .populate("followers", "_id username")
         .exec((err, result) => {
             if (err) {
                 return res.status(500).json({ error: err });
@@ -152,8 +152,8 @@ exports.removeFollower = (req, res) => {
         { $pull: { followers: req.body.userID } },
         { new: true } //mongodb nam bude navracat iba nove udaje
     )
-        .populate("following", "_id name")
-        .populate("followers", "_id name")
+        .populate("following", "_id username")
+        .populate("followers", "_id username")
         .exec((err, result) => {
             if (err) {
                 return res.status(500).json({ error: err });
