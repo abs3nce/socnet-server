@@ -13,26 +13,30 @@ router.get("/posts", postController.getPosts);
 
 router.get("/posts/:userid", postController.getPostsByUser);
 
+router.get("/posts/pfp/:postid", postController.getPostPicture);
+
 router.post(
-  "/posts/:userid",
-  [accountController.requireLogin],
-  postController.createPost
+    "/posts/:userid",
+    [accountController.requireLogin],
+    postController.createPost
 );
 
 //post vieme upravit tym ze jeho id targetneme a posleme put request s title a body
 //samozrejme treba byt ownerom a prihlaseny
 router.put(
-  "/posts/:postid",
-  [accountController.requireLogin, postController.isOwnerOfPost],
-  postController.updatePost
+    "/posts/:postid",
+    [accountController.requireLogin, postController.isOwnerOfPost],
+    postController.updatePost
 );
 
 //post vieme vymazat targetnutim jeho id, samozrejme treba byt ownerom a byt prihlaseny
 router.delete(
-  "/posts/:postid",
-  [accountController.requireLogin, postController.isOwnerOfPost],
-  postController.deletePost
+    "/posts/:postid",
+    [accountController.requireLogin, postController.isOwnerOfPost],
+    postController.deletePost
 );
+
+//navratenie imagu postu
 
 //pokial je v URL niekde "userID" tak presmeruje na middleware a funkciu userByID
 router.param("userid", userController.userByID);

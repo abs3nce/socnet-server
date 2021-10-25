@@ -51,6 +51,11 @@ exports.getPostsByUser = (req, res, next) => {
         });
 };
 
+exports.getPostPicture = (req, res, next) => {
+    res.set("Content-Type", req.post.image.contentType);
+    return res.send(req.post.image.data);
+};
+
 exports.createPost = (req, res, next) => {
     let form = new formidable.IncomingForm(); //vytvor novy form
     form.keepExtensions = true; //uchovaj extensions
@@ -83,11 +88,9 @@ exports.createPost = (req, res, next) => {
         }
 
         if (body.length > 1500) {
-            return res
-                .status(401)
-                .json({
-                    error: "The maximum length of body is 1500 characters",
-                });
+            return res.status(401).json({
+                error: "The maximum length of body is 1500 characters",
+            });
         }
 
         if (files.image) {
