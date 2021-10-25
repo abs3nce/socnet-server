@@ -163,3 +163,16 @@ exports.removeFollower = (req, res) => {
             res.json(result);
         });
 };
+
+exports.suggestedUsers = (req, res) => {
+    //vyhladanie uzivatelov, ktori nie su v rozsahu uz sledovanych
+    let following = req.profile.following;
+    following.push(req.profile._id);
+    //nin (not included)
+    User.find({ _id: { $nin: following } }, (err, users) => {
+        if (err) {
+            return res.status(500).json({ error: err });
+        }
+        res.json({ users });
+    }).select("username");
+};

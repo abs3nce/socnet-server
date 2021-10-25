@@ -28,6 +28,9 @@ router.get("/users/:userid", userController.getUser);
 //navratenie profilePicture uzivatela
 router.get("/users/pfp/:userid", userController.getUserProfilePicture);
 
+//navratenie uzivatelov ktorych moze user followovat (navrhovani uzivatelia)
+router.get("/users/suggested/:userid", userController.suggestedUsers);
+
 //upravenie profilu a udajov usera pomocou targetnutia jeho id
 //samozrejme moze iba prihlaseny owner
 router.put(
