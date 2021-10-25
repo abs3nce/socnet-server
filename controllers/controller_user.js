@@ -171,8 +171,10 @@ exports.suggestedUsers = (req, res) => {
     //nin (not included)
     User.find({ _id: { $nin: following } }, (err, users) => {
         if (err) {
-            return res.status(500).json({ error: err });
+            return res.status(500).json({
+                error: err,
+            });
         }
-        res.json({ users });
-    }).select("username");
+        res.json(users);
+    });
 };
