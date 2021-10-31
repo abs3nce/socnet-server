@@ -28,6 +28,10 @@ exports.isOwnerOfPost = (req, res, next) => {
     next();
 };
 
+exports.getPost = (req, res) => {
+    return res.json(req.post);
+};
+
 exports.getPosts = (req, res, next) => {
     const posts = Post.find()
         .populate("postedBy", "_id username created")

@@ -8,13 +8,19 @@ const accountController = require("../controllers/controller_account");
 const userController = require("../controllers/controller_user");
 
 // R O U T E S
+//get jedneho postu s idckom
+router.get("/posts/:postid", postController.getPost);
+
 //get vsetkych postov v DB
 router.get("/posts", postController.getPosts);
 
-router.get("/posts/:userid", postController.getPostsByUser);
+//get vsetkych postov uzivatela
+router.get("/posts/by/:userid", postController.getPostsByUser);
 
+//get obrazku jedneho postu s idckom
 router.get("/posts/pfp/:postid", postController.getPostPicture);
 
+//vytvorenie postu
 router.post(
     "/posts/:userid",
     [accountController.requireLogin],
