@@ -35,7 +35,7 @@ exports.getPost = (req, res) => {
 exports.getPosts = (req, res, next) => {
     const posts = Post.find()
         .populate("postedBy", "_id username created")
-        .sort({ created: -1 })
+        .sort({ _id: -1 })
         .then((posts) => {
             res.status(200).json(posts);
         })
@@ -48,10 +48,10 @@ exports.getPostsByUser = (req, res, next) => {
     Post.find({ postedBy: req.profile._id })
         //populate pouzivame pretoze v Post scheme mame definovane ze hladame referenciu na User schemu, ak by to bolo opacne pouzili by sme .select
         .populate("postedBy", "_id username")
-        .sort("_created")
+        .sort({ _id: -1 })
         .exec((err, posts) => {
             if (err) return res.status(500).json({ error: err });
-            res.status(200).json({ posts: posts });
+            res.status(200).json( posts );
         });
 };
 
