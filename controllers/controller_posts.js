@@ -51,7 +51,7 @@ exports.getPostsByUser = (req, res, next) => {
         .sort({ _id: -1 })
         .exec((err, posts) => {
             if (err) return res.status(500).json({ error: err });
-            res.status(200).json( posts );
+            res.status(200).json(posts);
         });
 };
 
@@ -91,9 +91,13 @@ exports.createPost = (req, res, next) => {
             });
         }
 
-        if (body.length > 1500) {
+        if (!body || !body.length) {
+            return res.status(401).json({ error: "Body must not be empty" });
+        }
+
+        if (body.length < 8 || body.length > 1500) {
             return res.status(401).json({
-                error: "The maximum length of body is 1500 characters",
+                error: "The body's length must be between 8 to 1500 characters",
             });
         }
 
