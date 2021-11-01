@@ -126,13 +126,33 @@ exports.createPost = (req, res, next) => {
     });
 };
 
-exports.updatePost = (req, res, next) => {
-    let post = req.post;
-    post = _.extend(post, req.body); // rozsitenie post objektu o info z req objektu
-    post.updated = Date.now();
-    post.save((err, post) => {
-        if (err) return res.status(500).json({ error: err });
-        res.status(200).json({ post: post });
+exports.updatePost = (req, res) => {
+    let form = new formidable.IncomingForm();
+    form.keepExtensions = true;
+    form.parse(req, (err, fields, files) => {
+        //chceme spracovat form fields a aj pripadne uploadovane images
+        if (err)
+            return res
+                .status(500)
+                .json({ error: "Photo could not be uploaded" });
+
+        let post = req.post;
+        post = _.extend(post, fields); //nahranie novych udajov do post objektu
+        post.updated = Date.now();
+
+        console.log(`post from FE: `,post);
+        if (files.image) {
+            post.image.data = fs.readFileSync(
+                files.image.path
+            );
+            post.image.contentType = files.image.type;
+        }
+
+        post.save((err, result) => {
+            if (err) return res.status(500).json({ error: err });
+
+            res.status(200).json(post);
+        });
     });
 };
 

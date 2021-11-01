@@ -67,6 +67,8 @@ exports.updateUser = (req, res, next) => {
         user = _.extend(user, fields); //nahranie novych udajov do user objektu
         user.updated = Date.now();
 
+
+        console.log(`user from FE: `,user);
         if (files.profilePicture) {
             user.profilePicture.data = fs.readFileSync(
                 files.profilePicture.path
