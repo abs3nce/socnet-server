@@ -12,22 +12,23 @@ dotenv.config();
 
 //databaza
 mongoose
-  .connect(process.env.DB_CONN, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log(`DB > CONNECTION SUCCESSFUL`);
-  });
+    .connect(process.env.DB_CONN, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => {
+        console.log(`DB > DB READY STATE: (`, mongoose.connection.readyState, ")");
+        console.log(`DB > CONNECTION SUCCESSFUL`);
+    });
 
 mongoose.connection.on("error", (err) => {
-  console.log(`DB > CONNECTION ERROR: ${err.message}`);
+    console.log(`DB > CONNECTION ERROR: ${err.message}`);
 });
 
 //deprication fix
-mongoose.set('useNewUrlParser', true);
-mongoose.set('useFindAndModify', false);
-mongoose.set('useCreateIndex', true);
+mongoose.set("useNewUrlParser", true);
+mongoose.set("useFindAndModify", false);
+mongoose.set("useCreateIndex", true);
 
 //import custom routes
 const postRoutes = require("./routes/route_posts");
@@ -49,27 +50,27 @@ app.use("/", usersRoutes);
 
 //dokumentacia API na "/" route
 app.get("/", (req, res, next) => {
-  fs.readFile("docs/apidocs.json", (err, data) => {
-    if (err) {
-      res.status(500).json({ error: err });
-    }
-    const docs = JSON.parse(data);
-    res.status(200).json(docs);
-  });
+    fs.readFile("docs/apidocs.json", (err, data) => {
+        if (err) {
+            res.status(500).json({ error: err });
+        }
+        const docs = JSON.parse(data);
+        res.status(200).json(docs);
+    });
 });
 
 //funkcia express-jwt ktora handluje (kazdy) 'UnauthorizedError'
 //podla nej menim response json
 app.use(function (err, req, res, next) {
-  if (err.name === "UnauthorizedError") {
-    res
-      .status(401)
-      .json({ error: "User must be logged in to perform this action" });
-  }
+    if (err.name === "UnauthorizedError") {
+        res.status(401).json({
+            error: "User must be logged in to perform this action",
+        });
+    }
 });
 
 //listening serveru na porte
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
-  console.log(`API > LISTENING ON PORT: ${port}`);
+    console.log(`API > LISTENING ON PORT: ${port}`);
 });

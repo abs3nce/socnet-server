@@ -28,19 +28,6 @@
 ██╔═══╝░██╔══██║██║██║╚████║
 ██║░░░░░██║░░██║██║██║░╚███║
 ╚═╝░░░░░╚═╝░░╚═╝╚═╝╚═╝░░╚══╝
-
-
-
-1. 
-
-Post validator je broken, treba vymysliet ako budem kontrolovat data vo x-www-form-urlencoded formate pretoze doteraz fungoval kedze sme passovali raw json data
-
-2. 
-
-Premysliet admin backend
-
-
-
 ██████╗░░█████╗░██╗███╗░░██╗
 ██╔══██╗██╔══██╗██║████╗░██║
 ██████╔╝███████║██║██╔██╗██║
