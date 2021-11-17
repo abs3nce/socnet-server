@@ -46,7 +46,25 @@ const postSchema = new mongoose.Schema({
 
     likes: [{ type: ObjectId, ref: "User" }],
 
-    exifData: Schema.Types.Mixed,
+    exifData: {
+        image: {
+            Make: String,
+            Model: String,
+            ModifyDate: String,
+            Artist: String,
+        },
+        exif: {
+            ExposureTime: Number,
+            FNumber: Number,
+            ISO: Number,
+            ExposureCompensation: Number,
+            ShutterSpeedValue: Number,
+            ApertureValue: Number,
+            FocalLength: Number,
+            FocalLengthIn35mmFormat: Number,
+            LensModel: String,
+        },
+    },
     // exifData: Object,
 
     // cameraModel: String,
@@ -103,18 +121,3 @@ module.exports = mongoose.model("Post", postSchema);
 // });
 
 // module.exports = mongoose.model("Post", postSchema);
-
-// image: {
-//     Make: String,
-//     Model: String,
-//     ModifyDate: String,
-//     Artist: String,
-// },
-// exif: {
-//     ExposureTime: Number,
-//     FNumber: Number,
-//     ISO: Number,
-//     FocalLength: Number,
-//     FocalLengthIn35mmFormat: Number,
-//     LensModel: String,
-// },I
