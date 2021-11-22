@@ -121,8 +121,10 @@ exports.createPost = (req, res, next) => {
                         error,
                         exifData
                     ) {
-                        if (error) console.log("Error: ", error.message);
-                        else {
+                        if (error) {
+                            console.log("Error: ", error.message);
+                            res();
+                        } else {
                             res(exifData);
                         }
                     });
@@ -168,8 +170,10 @@ exports.updatePost = (req, res) => {
                         error,
                         exifData
                     ) {
-                        if (error) console.log("Error: ", error.message);
-                        else {
+                        if (error) {
+                            console.log("Error: ", error.message);
+                            res();
+                        } else {
                             res(exifData);
                         }
                     });

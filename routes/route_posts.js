@@ -12,15 +12,22 @@ const userController = require("../controllers/controller_user");
 router.get("/posts/by/:userid", postController.getPostsByUser);
 
 //like unlike
-router.put('/posts/like',accountController.requireLogin, postController.likePost)
-router.put('/posts/unlike', accountController.requireLogin, postController.unLikePost)
+router.put(
+    "/posts/like",
+    accountController.requireLogin,
+    postController.likePost
+);
+router.put(
+    "/posts/unlike",
+    accountController.requireLogin,
+    postController.unLikePost
+);
 
 //get jedneho postu s idckom
 router.get("/posts/:postid", postController.getPost);
 
 //get vsetkych postov v DB
 router.get("/posts", postController.getPosts);
-
 
 //get obrazku jedneho postu s idckom
 router.get("/posts/pfp/:postid", postController.getPostPicture);
@@ -31,8 +38,6 @@ router.post(
     [accountController.requireLogin],
     postController.createPost
 );
-
-
 
 //post vieme upravit tym ze jeho id targetneme a posleme put request s title a body
 //samozrejme treba byt ownerom a prihlaseny
