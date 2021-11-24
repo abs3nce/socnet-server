@@ -178,5 +178,5 @@ exports.suggestedUsers = (req, res) => {
             });
         }
         res.json(users);
-    }).select("username");
+    }).select("username following followers");
 };
