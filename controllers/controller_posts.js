@@ -12,6 +12,8 @@ const Post = require("../schemes/scheme_post");
 exports.postByID = (req, res, next, id) => {
     Post.findById(id)
         .populate("postedBy", "_id username")
+        .populate("comments", "text created")
+        .populate("comments.postedBy", "_id username")
         .exec((err, post) => {
             if (err || !post) return res.status(401).json({ error: err });
             req.post = post;
@@ -36,6 +38,8 @@ exports.getPost = (req, res) => {
 exports.getPosts = (req, res, next) => {
     const posts = Post.find()
         .populate("postedBy", "_id username created")
+        .populate("comments", "text created")
+        .populate("comments.postedBy", "_id username")
         .sort({ _id: -1 })
         .then((posts) => {
             res.status(200).json(posts);
@@ -230,6 +234,48 @@ exports.unLikePost = (req, res) => {
             res.json(result);
         }
     });
+};
+
+exports.commentPost = (req, res) => {
+    let comment = req.body.comment;
+    comment.postedBy = req.body.userID;
+
+    Post.findByIdAndUpdate(
+        req.body.postID,
+        {
+            $push: { comments: comment },
+        },
+        { new: true }
+    )
+        .populate("comments.postedBy", "_id username")
+        .populate("postedBy", "_id username")
+        .exec((err, result) => {
+            if (err) {
+                return res.status(500).json({ error: err });
+            } else {
+                res.json(result);
+            }
+        });
+};
+exports.uncommentPost = (req, res) => {
+    let comment = req.body.comment;
+
+    Post.findByIdAndUpdate(
+        req.body.postID,
+        {
+            $pull: { comments: { _id: comment._id } },
+        },
+        { new: true }
+    )
+        .populate("comments.postedBy", "_id username")
+        .populate("postedBy", "_id username")
+        .exec((err, result) => {
+            if (err) {
+                return res.status(500).json({ error: err });
+            } else {
+                res.json(result);
+            }
+        });
 };
 
 // //obsahuje logiku pre posty, getovanie, vytvorenie....

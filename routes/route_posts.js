@@ -17,11 +17,26 @@ router.put(
     accountController.requireLogin,
     postController.likePost
 );
+
 router.put(
     "/posts/unlike",
     accountController.requireLogin,
     postController.unLikePost
 );
+
+router.put(
+    "/posts/comment",
+    accountController.requireLogin,
+    postController.commentPost
+);
+
+router.put(
+    "/posts/uncomment",
+    accountController.requireLogin,
+    postController.uncommentPost
+);
+
+
 
 //get jedneho postu s idckom
 router.get("/posts/:postid", postController.getPost);

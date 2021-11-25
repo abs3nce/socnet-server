@@ -27,25 +27,6 @@ const postSchema = new mongoose.Schema({
         */
     },
 
-    postedBy: {
-        /*
-        objectId:
-        typ objectId je napriklad aj bezne _id ktore je generovane pri kazdom objekte
-        v mongodb databaze, je to proste specialnyt typ integeru a vola sa objectId 
-        */
-        type: ObjectId, //userid
-        ref: "User", //referencujeme inu schemu >> User model
-    },
-
-    created: {
-        type: Date,
-        default: Date.now(),
-    },
-
-    updated: Date,
-
-    likes: [{ type: ObjectId, ref: "User" }],
-
     exifData: {
         image: {
             Make: String,
@@ -65,9 +46,39 @@ const postSchema = new mongoose.Schema({
             LensModel: String,
         },
     },
-    // exifData: Object,
 
-    // cameraModel: String,
+    postedBy: {
+        /*
+        objectId:
+        typ objectId je napriklad aj bezne _id ktore je generovane pri kazdom objekte
+        v mongodb databaze, je to proste specialnyt typ integeru a vola sa objectId 
+        */
+        type: ObjectId, //userid
+        ref: "User", //referencujeme inu schemu >> User model
+    },
+
+    created: {
+        type: Date,
+        default: Date.now(),
+    },
+
+    updated: Date,
+
+    likes: [{ type: ObjectId, ref: "User" }],
+
+    comments: [
+        {
+            text: String,
+            created: {
+                type: Date,
+                default: Date.now,
+            },
+            postedBy: {
+                type: ObjectId,
+                ref: "User",
+            },
+        },
+    ],
 });
 
 module.exports = mongoose.model("Post", postSchema);
