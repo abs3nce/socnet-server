@@ -17,6 +17,7 @@ exports.postByID = (req, res, next, id) => {
         .exec((err, post) => {
             if (err || !post) return res.status(401).json({ error: err });
             req.post = post;
+            console.log(`API (POSTS) > FINDING POST WITH ID ${id}`);
             next();
         });
 };
@@ -32,6 +33,8 @@ exports.isOwnerOfPost = (req, res, next) => {
 };
 
 exports.getPost = (req, res) => {
+    console.log(`API (POSTS) > GETTING POST WITH ID ${req.post._id}`);
+
     return res.json(req.post);
 };
 
@@ -42,6 +45,7 @@ exports.getPosts = (req, res, next) => {
         .populate("comments.postedBy", "_id username")
         .sort({ _id: -1 })
         .then((posts) => {
+            console.log(`API (POSTS) > GETTING ALL POSTS`);
             res.status(200).json(posts);
         })
         .catch((err) => {

@@ -12,18 +12,37 @@ const { sendEmail } = require("../helpers/mailer");
 exports.registerUser = async (req, res, next) => {
     //checkni pre duplikovany ucet
     //pokial tento user uz existuje tak zamietni registraciu
+
+    console.log(
+        `API (REGISTER) > USER ${req.body.username} ATTEMPTING TO REGISTER WITH DATA: `,
+        req.body
+    );
+
     usernameExists = await User.findOne({ username: req.body.username });
-    if (usernameExists)
+    if (usernameExists) {
+        console.log(
+            `API (REGISTER) > USER REGISTRATION DENIED, USERNAME ALREADY EXISTS (${req.body.username})`
+        );
         return res.status(401).json({ error: "Username already in use" });
+    }
 
     emailExists = await User.findOne({ email: req.body.email });
-    if (emailExists)
+    if (emailExists) {
+        console.log(
+            `API (REGISTER) > USER REGISTRATION DENIED, EMAIL ALREADY EXISTS (${req.body.email})`
+        );
         return res.status(401).json({ error: "Email already in use" });
+    }
+
+    console.log(
+        `API (REGISTER) > USER ${req.body.username} IS VALID AND READY TO BE SAVED`
+    );
 
     const user = await new User(req.body); //pokial tento user neexistoval >> vytvor novy instance Usera s udajmi z FE
     await user.save(); //uloz ho do DB a na FE posli response s udajmi
 
-    console.log(`API (REGISTER) > SAVING USER TO DB: ${user}`);
+    console.log(`API (REGISTER) > SAVING USER TO DB: `, user);
+    console.log(`API (REGISTER) > USER ${req.body.username} SAVED TO DB`);
     res.status(200).json({
         user: {
             username: user.username,
@@ -39,23 +58,37 @@ exports.loginUser = (req, res, next) => {
     //najdenie usera na zaklade username
     const { _id, username, password } = req.body;
 
+    console.log(
+        `API (LOGIN) > USER ${username} ATTEMPTING TO LOGIN WITH DATA: `,
+        req.body
+    );
     User.findOne({ username: username }, (err, user) => {
         //pokial nastali nejake errory
-        if (err)
+        if (err) {
+            console.log(`API (LOGIN) > INTERNAL SERVER ERROR`);
             return res.status(500).json({ error: "Internal server error" });
+        }
 
         //pokial user nebol najdeny
         if (!user) {
+            console.log(`API (LOGIN) > USER ${username} NOT FOUND`);
             return res
                 .status(401)
                 .json({ error: "Invalid credentials, please try again" });
         }
         //pokial bol user najdeny ale heslo bolo zle zadane (v authUser() metode User schemy bolo returnute false) >> zamietnutie
         if (!user.authUser(password)) {
+            console.log(
+                `API (LOGIN) > USER ${username} DENIED, INVALID CREDENTIALS`
+            );
             return res
                 .status(401)
                 .json({ error: "Invalid credentials, please try again" });
         }
+        console.log(`API (LOGIN) > USER ${username} FOUND`);
+        console.log(`API (LOGIN) > USER ${username} HAS VALID CREDENTIALS`);
+        console.log(`API (LOGIN) > GENERATING TOKEN FOR USER ${username}`);
+
         //pokial bol user najdeny ale heslo bolo spravne zadane (v authUser() v User modeli funkcii bolo returnute true) >> generovanie tokenu
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
@@ -104,9 +137,9 @@ exports.forgotPassword = (req, res) => {
         if (err || !user) {
             console.log(`API (FORGOT PASSWORD) > USER NOT FOUND`);
             console.log(`API (FORGOT PASSWORD) > RETURNING WITH ERROR`);
-            return res
-                .status(500)
-                .json({ error: "User with that email does not exist" });
+            return res.status(500).json({
+                error: "User with that email does not exist. Please try again using different email address.",
+            });
         }
 
         console.log(
@@ -153,7 +186,7 @@ exports.forgotPassword = (req, res) => {
                     `API (FORGOT PASSWORD) > EMAIL HAS BEEN SUCCESSFULLY SENT TO USER ${user.username} ON ${user.email} `
                 );
                 return res.status(200).json({
-                    message: `Email has been successfully sent to ${user.email}. Follow the instructions appended in the email to reset your password`,
+                    message: `Email has been successfully sent to ${user.email}. Check your inbox for further instructions.`,
                 });
             }
         });
@@ -178,13 +211,13 @@ exports.resetPassword = (req, res) => {
             });
         }
 
-        console.log(
-            `API (RESET PASSWORD) > UPDATING USER (${user.username}) WITH NEW DATA`
-        );
         const updatedFields = {
             password: newPassword,
             resetPasswordLink: "",
         };
+        console.log(
+            `API (RESET PASSWORD) > UPDATING USER (${user.username}) WITH NEW DATA ${updatedFields.password}`
+        );
 
         user = _.extend(user, updatedFields);
         user.updated = Date.now();
@@ -197,7 +230,8 @@ exports.resetPassword = (req, res) => {
         user.save((err, result) => {
             if (err) return res.status(500).json({ error: err });
             console.log(
-                `API (RESET PASSWORD) > USER ${user.username} SUCCESSFULLY SAVED`
+                `API (RESET PASSWORD) > USER ${user.username} SUCCESSFULLY SAVED WITH NEW DATA: `,
+                user
             );
             res.status(200).json({
                 message: "Great! Now you can login with your new password",

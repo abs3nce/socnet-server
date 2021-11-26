@@ -62,3 +62,7 @@
 
 
 pokial chceme uploadnut fotku bez exifu tak sa to proste neda
+
+urobit pekne logovanie requestov
+
+pridanie protekcie proti spamovaniu mailu cez nodemailera
