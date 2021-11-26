@@ -216,7 +216,7 @@ exports.resetPassword = (req, res) => {
             resetPasswordLink: "",
         };
         console.log(
-            `API (RESET PASSWORD) > UPDATING USER (${user.username}) WITH NEW DATA ${updatedFields.password}`
+            `API (RESET PASSWORD) > UPDATING USER (${user.username}) WITH NEW PASSWORD: ${updatedFields.password}`
         );
 
         user = _.extend(user, updatedFields);
