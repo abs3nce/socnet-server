@@ -1,8 +1,13 @@
 //obsahuje logiku ktorou sa bude riesit prihlasovanie uzivatela, registracia, odhlasovanie a veci okolo jeho uctu
+const User = require("../schemes/scheme_user");
 const jwt = require("jsonwebtoken");
 const expressJWT = require("express-jwt");
 require("dotenv").config();
-const User = require("../schemes/scheme_user");
+const dotenv = require("dotenv");
+dotenv.config();
+const _ = require("lodash");
+const { sendEmail } = require("../helpers/mailer");
+// load env
 
 exports.registerUser = async (req, res, next) => {
     //checkni pre duplikovany ucet
@@ -115,7 +120,7 @@ exports.forgotPassword = (req, res) => {
         const token = jwt.sign(
             {
                 _id: user._id,
-                issuer: "NODEAPI",
+                iss: "NODEAPI",
             },
             process.env.JWT_SECRET
         );
@@ -166,7 +171,7 @@ pokial sa uzivatelsky resetPasswordLink(token) zhoduje s prichadzajucim req.body
 exports.resetPassword = (req, res) => {
     const { resetPasswordLink, newPassword } = req.body;
 
-    User.findOne({ resetPasswordLink: resetPasswordLink }, (err, user) => {
+    User.findOne({ resetPasswordLink }, (err, user) => {
         if (err || !user) {
             return res.status(400).json({
                 error: "Invalid Link",
