@@ -239,3 +239,57 @@ exports.resetPassword = (req, res) => {
         });
     });
 };
+
+exports.socialLogin = (req, res) => {
+    //pokus o registraciu hladanim uzivatela s req.body.email
+    let user = User.findOne({ email: req.body.email }, (err, user) => {
+        if (err || !user) {
+            //vytvorenie noveho usera a nasledny login
+            user = new User(req.body);
+            req.profile = user;
+            user.save();
+
+            //generovanie noveho tokenu pre uzivatela
+            const token = jwt.sign(
+                { _id: user._id, iss: "NODEAPI" },
+                process.env.JWT_SECRET
+            );
+            res.cookie("token", token, { expire: new Date() + 3600 });
+
+            //navratenie udajov na frontend
+            const { _id, username, email } = user;
+            return res.status(200).json({
+                token: token,
+                user: {
+                    username,
+                    email,
+                    _id,
+                },
+            });
+        } else {
+            //aktualizovanie existujuceho uzivatela s novymi udajmi (social info) a nasledny login
+            req.profile = user;
+            user = _.extend(user, req.body);
+            user.updated = new Date.now();
+            user.save();
+
+            //generovanie noveho tokenu pre uzivatela
+            const token = jwt.sign(
+                { _id: user._id, iss: "NODEAPI" },
+                process.env.JWT_SECRET
+            );
+            res.cookie("token", token, { expire: new Date() + 3600 });
+
+            //navratenie udajov na frontend
+            const { _id, username, email } = user;
+            return res.status(200).json({
+                token: token,
+                user: {
+                    username,
+                    email,
+                    _id,
+                },
+            });
+        }
+    });
+};

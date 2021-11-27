@@ -22,9 +22,13 @@ router.post(
 //tu sa nemusi nic kontrolat kedze je to login
 router.post("/login", accountController.loginUser);
 
+//social login cez google napr
+router.post("/social-login", accountController.socialLogin); 
+
 //tu realne robime iba get req na to aby sme sa odhlasili vymazanim cookiesky
 router.get("/logout", accountController.logoutUser);
 
+//routes na ovladanie zabudnutia hesla
 router.put("/forgot-password", accountController.forgotPassword);
 router.put(
     "/reset-password",
