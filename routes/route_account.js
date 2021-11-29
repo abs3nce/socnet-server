@@ -23,7 +23,7 @@ router.post(
 router.post("/login", accountController.loginUser);
 
 //social login cez google napr
-router.post("/social-login", accountController.socialLogin); 
+// router.post("/social-login", accountController.socialLogin);
 
 //tu realne robime iba get req na to aby sme sa odhlasili vymazanim cookiesky
 router.get("/logout", accountController.logoutUser);
