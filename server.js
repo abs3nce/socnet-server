@@ -44,12 +44,12 @@ app.use(morgan("dev"));
 
 //routes
 //pouzite ako middleware, pri accessnuti "/" presmeruju na spravny route podla url (vsetko v subore routes)
-app.use("/", postRoutes);
-app.use("/", authRoutes);
-app.use("/", usersRoutes);
+app.use("/api", postRoutes);
+app.use("/api", authRoutes);
+app.use("/api", usersRoutes);
 
 //dokumentacia API na "/" route
-app.get("/", (req, res, next) => {
+app.get("/api", (req, res, next) => {
     fs.readFile("docs/apidocs.json", (err, data) => {
         if (err) {
             res.status(500).json({ error: err });
