@@ -2,8 +2,8 @@
 const User = require("../schemes/scheme_user");
 const jwt = require("jsonwebtoken");
 const expressJWT = require("express-jwt");
-require("dotenv").config();
 const dotenv = require("dotenv");
+require("dotenv").config();
 dotenv.config();
 const _ = require("lodash");
 const { sendEmail } = require("../helpers/mailer");
