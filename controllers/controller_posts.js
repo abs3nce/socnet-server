@@ -4,6 +4,7 @@ const _ = require("lodash");
 const formidable = require("formidable");
 const fs = require("fs");
 const ExifImage = require("exif").ExifImage;
+const jimp = require("jimp");
 
 //models
 const Post = require("../schemes/scheme_post");
@@ -67,6 +68,11 @@ exports.getPostsByUser = (req, res, next) => {
 exports.getPostPicture = (req, res, next) => {
     res.set("Content-Type", req.post.image.contentType);
     return res.send(req.post.image.data);
+};
+
+exports.getPostThumbnail = (req, res, next) => {
+    res.set("Content-Type", req.post.thumbnailImage.contentType);
+    return res.send(req.post.thumbnailImage.data);
 };
 
 exports.createPost = (req, res, next) => {
@@ -141,6 +147,17 @@ exports.createPost = (req, res, next) => {
                     rej();
                 }
             });
+
+            const thumb = await jimp.read(post.image.data);
+            post.thumbnailImage.data = await thumb
+                .cover(
+                    256,
+                    256,
+                    jimp.HORIZONTAL_ALIGN_CENTER | jimp.VERTICAL_ALIGN_MIDDLE
+                )
+                .grayscale()
+                .getBufferAsync(jimp.AUTO);
+            post.thumbnailImage.contentType = files.image.type;
         }
 
         post.save((err, result) => {
@@ -191,6 +208,17 @@ exports.updatePost = (req, res) => {
                 }
             });
         }
+
+        const thumb = await jimp.read(post.image.data);
+        post.thumbnailImage.data = await thumb
+            .cover(
+                256,
+                256,
+                jimp.HORIZONTAL_ALIGN_CENTER | jimp.VERTICAL_ALIGN_MIDDLE
+            )
+            .grayscale()
+            .getBufferAsync(jimp.AUTO);
+        post.thumbnailImage.contentType = files.image.type;
 
         post.save((err, result) => {
             if (err) return res.status(500).json({ error: err });
@@ -281,13 +309,12 @@ exports.uncommentPost = (req, res) => {
             }
         });
 };
-
 // //obsahuje logiku pre posty, getovanie, vytvorenie....
 
 // const _ = require("lodash");
 // const formidable = require("formidable");
 // const fs = require("fs");
-// const ExifImage = require('exif').ExifImage;
+// const ExifImage = require("exif").ExifImage;
 
 // //models
 // const Post = require("../schemes/scheme_post");
@@ -296,9 +323,12 @@ exports.uncommentPost = (req, res) => {
 // exports.postByID = (req, res, next, id) => {
 //     Post.findById(id)
 //         .populate("postedBy", "_id username")
+//         .populate("comments", "text created")
+//         .populate("comments.postedBy", "_id username")
 //         .exec((err, post) => {
 //             if (err || !post) return res.status(401).json({ error: err });
 //             req.post = post;
+//             console.log(`API (POSTS) > FINDING POST WITH ID ${id}`);
 //             next();
 //         });
 // };
@@ -314,14 +344,19 @@ exports.uncommentPost = (req, res) => {
 // };
 
 // exports.getPost = (req, res) => {
+//     console.log(`API (POSTS) > GETTING POST WITH ID ${req.post._id}`);
+
 //     return res.json(req.post);
 // };
 
 // exports.getPosts = (req, res, next) => {
 //     const posts = Post.find()
 //         .populate("postedBy", "_id username created")
+//         .populate("comments", "text created")
+//         .populate("comments.postedBy", "_id username")
 //         .sort({ _id: -1 })
 //         .then((posts) => {
+//             console.log(`API (POSTS) > GETTING ALL POSTS`);
 //             res.status(200).json(posts);
 //         })
 //         .catch((err) => {
@@ -349,7 +384,7 @@ exports.uncommentPost = (req, res) => {
 //     let form = new formidable.IncomingForm(); //vytvor novy form
 //     form.keepExtensions = true; //uchovaj extensions
 //     //parsni form s udajmi z req a ak nasledne handleni callbacks
-//     form.parse(req, (err, fields, files) => {
+//     form.parse(req, async (err, fields, files) => {
 //         //handler pre error pri nahravani image
 //         if (err)
 //             return res
@@ -398,6 +433,25 @@ exports.uncommentPost = (req, res) => {
 //             //handling suborov z FE pomocou fska
 //             post.image.data = fs.readFileSync(files.image.path);
 //             post.image.contentType = files.image.type;
+
+//             post.exifData = await new Promise((res, rej) => {
+//                 try {
+//                     new ExifImage({ image: post.image.data }, function (
+//                         error,
+//                         exifData
+//                     ) {
+//                         if (error) {
+//                             console.log("Error: ", error.message);
+//                             res();
+//                         } else {
+//                             res(exifData);
+//                         }
+//                     });
+//                 } catch (error) {
+//                     console.log("Error: ", error.message);
+//                     rej();
+//                 }
+//             });
 //         }
 
 //         post.save((err, result) => {
@@ -405,16 +459,15 @@ exports.uncommentPost = (req, res) => {
 //             if (err)
 //                 return res.status(500).json({ error: "Internal server error" });
 //             res.status(200).json({ result: result });
+//             console.log(`API > POST DATA: `, result);
 //         });
-
-//         console.log(`API > CREATING POST: ${post}`);
 //     });
 // };
 
 // exports.updatePost = (req, res) => {
 //     let form = new formidable.IncomingForm();
 //     form.keepExtensions = true;
-//     form.parse(req, (err, fields, files) => {
+//     form.parse(req, async (err, fields, files) => {
 //         //chceme spracovat form fields a aj pripadne uploadovane images
 //         if (err)
 //             return res
@@ -429,6 +482,25 @@ exports.uncommentPost = (req, res) => {
 //         if (files.image) {
 //             post.image.data = fs.readFileSync(files.image.path);
 //             post.image.contentType = files.image.type;
+
+//             post.exifData = await new Promise((res, rej) => {
+//                 try {
+//                     new ExifImage({ image: post.image.data }, function (
+//                         error,
+//                         exifData
+//                     ) {
+//                         if (error) {
+//                             console.log("Error: ", error.message);
+//                             res();
+//                         } else {
+//                             res(exifData);
+//                         }
+//                     });
+//                 } catch (error) {
+//                     console.log("Error: ", error.message);
+//                     rej();
+//                 }
+//             });
 //         }
 
 //         post.save((err, result) => {
@@ -458,7 +530,7 @@ exports.uncommentPost = (req, res) => {
 //         if (err) {
 //             return res.status(500).json({ error: err });
 //         } else {
-//             res.json(result)
+//             res.json(result);
 //         }
 //     });
 // };
@@ -474,7 +546,49 @@ exports.uncommentPost = (req, res) => {
 //         if (err) {
 //             return res.status(500).json({ error: err });
 //         } else {
-//             res.json(result)
+//             res.json(result);
 //         }
 //     });
+// };
+
+// exports.commentPost = (req, res) => {
+//     let comment = req.body.comment;
+//     comment.postedBy = req.body.userID;
+
+//     Post.findByIdAndUpdate(
+//         req.body.postID,
+//         {
+//             $push: { comments: comment },
+//         },
+//         { new: true }
+//     )
+//         .populate("comments.postedBy", "_id username")
+//         .populate("postedBy", "_id username")
+//         .exec((err, result) => {
+//             if (err) {
+//                 return res.status(500).json({ error: err });
+//             } else {
+//                 res.json(result);
+//             }
+//         });
+// };
+// exports.uncommentPost = (req, res) => {
+//     let comment = req.body.comment;
+
+//     Post.findByIdAndUpdate(
+//         req.body.postID,
+//         {
+//             $pull: { comments: { _id: comment._id } },
+//         },
+//         { new: true }
+//     )
+//         .populate("comments.postedBy", "_id username")
+//         .populate("postedBy", "_id username")
+//         .exec((err, result) => {
+//             if (err) {
+//                 return res.status(500).json({ error: err });
+//             } else {
+//                 res.json(result);
+//             }
+//         });
 // };

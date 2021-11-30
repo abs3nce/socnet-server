@@ -26,6 +26,10 @@ const postSchema = new mongoose.Schema({
         'ascii'|'utf8'|'utf16le'|'ucs2'|'base64'|'binary'|'hex'
         */
     },
+    thumbnailImage: {
+        data: Buffer,
+        contentType: "String",
+    },
 
     exifData: {
         image: {
@@ -34,6 +38,7 @@ const postSchema = new mongoose.Schema({
             ModifyDate: String,
             Artist: String,
         },
+
         exif: {
             ExposureTime: Number,
             FNumber: Number,

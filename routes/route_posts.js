@@ -44,8 +44,12 @@ router.get("/posts/:postid", postController.getPost);
 //get vsetkych postov v DB
 router.get("/posts", postController.getPosts);
 
+//get thumbnailu obrazku jedneho postu s idckom
+router.get("/posts/pfp/thumb/:postid", postController.getPostThumbnail);
+
 //get obrazku jedneho postu s idckom
 router.get("/posts/pfp/:postid", postController.getPostPicture);
+
 
 //vytvorenie postu
 router.post(
