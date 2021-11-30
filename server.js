@@ -4,11 +4,11 @@ const app = express();
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+dotenv.config();
 const expressValidator = require("express-validator");
 const cookieParser = require("cookie-parser");
 const fs = require("fs");
 const cors = require("cors");
-dotenv.config();
 
 //databaza
 mongoose
