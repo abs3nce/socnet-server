@@ -67,8 +67,7 @@ exports.updateUser = (req, res, next) => {
         user = _.extend(user, fields); //nahranie novych udajov do user objektu
         user.updated = Date.now();
 
-
-        console.log(`user from FE: `,user);
+        console.log(`user from FE: `, user);
         if (files.profilePicture) {
             user.profilePicture.data = fs.readFileSync(
                 files.profilePicture.path
@@ -168,15 +167,32 @@ exports.removeFollower = (req, res) => {
 
 exports.suggestedUsers = (req, res) => {
     //vyhladanie uzivatelov, ktori nie su v rozsahu uz sledovanych
-    let following = req.profile.following;
-    following.push(req.profile._id);
+    let userFollows = req.profile.following;
+    console.log(`${req.profile.username} follows: `, userFollows);
+
     //nin (not included)
-    User.find({ _id: { $nin: following } }, (err, users) => {
+    User.find({ followers: { $in: userFollows } }, (err, users) => {
         if (err) {
             return res.status(500).json({
                 error: err,
             });
         }
+        console.log(users);
         res.json(users);
     }).select("username following followers");
 };
+
+// exports.suggestedUsers = (req, res) => {
+//     //vyhladanie uzivatelov, ktori nie su v rozsahu uz sledovanych
+//     let following = req.profile.following;
+//     following.push(req.profile._id);
+//     //nin (not included)
+//     User.find({ _id: { $nin: following } }, (err, users) => {
+//         if (err) {
+//             return res.status(500).json({
+//                 error: err,
+//             });
+//         }
+//         res.json(users);
+//     }).select("username following followers");
+// };
