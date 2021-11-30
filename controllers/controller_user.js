@@ -168,18 +168,25 @@ exports.removeFollower = (req, res) => {
 exports.suggestedUsers = (req, res) => {
     //vyhladanie uzivatelov, ktori nie su v rozsahu uz sledovanych
     let userFollows = req.profile.following;
-    console.log(`${req.profile.username} follows: `, userFollows);
+    let exceptUsers = req.profile.following;
+    exceptUsers.push(req.profile._id);
+    // console.log(`${req.profile.username} follows: `, userFollows);
 
     //nin (not included)
-    User.find({ followers: { $in: userFollows } }, (err, users) => {
-        if (err) {
-            return res.status(500).json({
-                error: err,
-            });
+    User.find(
+        { followers: { $in: userFollows }, _id: { $nin: exceptUsers } },
+        (err, users) => {
+            if (err) {
+                return res.status(500).json({
+                    error: err,
+                });
+            }
+
+            let uniqueUsers = _.uniq(users);
+            console.log(uniqueUsers);
+            res.json(uniqueUsers);
         }
-        console.log(users);
-        res.json(users);
-    }).select("username following followers");
+    ).select("username following followers");
 };
 
 // exports.suggestedUsers = (req, res) => {
