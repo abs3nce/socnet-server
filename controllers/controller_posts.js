@@ -206,17 +206,17 @@ exports.updatePost = (req, res) => {
                     rej();
                 }
             });
+            
+            const thumb = await jimp.read(post.image.data);
+            post.thumbnailImage.data = await thumb
+                .cover(
+                    256,
+                    256,
+                    jimp.HORIZONTAL_ALIGN_CENTER | jimp.VERTICAL_ALIGN_MIDDLE
+                )
+                .getBufferAsync(jimp.AUTO);
+            post.thumbnailImage.contentType = files.image.type;
         }
-
-        const thumb = await jimp.read(post.image.data);
-        post.thumbnailImage.data = await thumb
-            .cover(
-                256,
-                256,
-                jimp.HORIZONTAL_ALIGN_CENTER | jimp.VERTICAL_ALIGN_MIDDLE
-            )
-            .getBufferAsync(jimp.AUTO);
-        post.thumbnailImage.contentType = files.image.type;
 
         post.save((err, result) => {
             if (err) return res.status(500).json({ error: err });
