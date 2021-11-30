@@ -155,7 +155,6 @@ exports.createPost = (req, res, next) => {
                     256,
                     jimp.HORIZONTAL_ALIGN_CENTER | jimp.VERTICAL_ALIGN_MIDDLE
                 )
-                .grayscale()
                 .getBufferAsync(jimp.AUTO);
             post.thumbnailImage.contentType = files.image.type;
         }
