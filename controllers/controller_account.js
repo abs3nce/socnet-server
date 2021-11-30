@@ -186,7 +186,7 @@ exports.forgotPassword = (req, res) => {
                     `API (FORGOT PASSWORD) > EMAIL HAS BEEN SUCCESSFULLY SENT TO USER ${user.username} ON ${user.email} `
                 );
                 return res.status(200).json({
-                    message: `Email has been successfully sent to ${user.email}. Check your inbox for further instructions.`,
+                    message: `Email has been successfully sent to ${user.email}. Check your inbox (or spam) for further instructions.`,
                 });
             }
         });
