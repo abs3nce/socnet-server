@@ -55,14 +55,41 @@ exports.getPosts = (req, res, next) => {
 };
 
 exports.getFollowedFeed = (req, res, next) => {
-    const userFollowing = req.profile.following;
-    console.log(`${req.profile.username}'s following: `, userFollowing);
-    // return res.status(200).json({ message: "success" });
-    Post.find({ postedBy: { $in: userFollowing } }, (err, posts) => {
-        if (err) return res.status(401).json({ error: err });
+    let userFollows = req.profile.following;
+    userFollows.push(req.profile._id);
+
+    console.log(`Users followed by ${req.profile.username}: `, userFollows);
+
+    Post.find({ postedBy: { $in: userFollows } }, (err, posts) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: err });
+        }
+        console.log(posts);
         res.status(200).json(posts);
-    });
+    })
+        .populate("comments", "text created")
+        .populate("comments.postedBy", "_id username")
+        .populate("postedBy", "_id username created")
+        .sort({ _id: -1 });
 };
+
+// exports.getFollowedFeed = (req, res, next) => {
+//     const userFollowing = req.profile.following;
+//     console.log(`${req.profile.username}'s following: `, userFollowing);
+//     // return res.status(200).json({ message: "success" });
+//     Post.find({ postedBy: { $in: userFollowing } }, (err, posts) => {
+//         if (err) {
+//             console.log(err);
+//             return res.status(401).json({ error: err });
+//         }
+//         console.log(posts);
+//         res.status(200).json(posts);
+//     })
+//         .populate("postedBy", "_id username created")
+//         .populate("comments", "text created")
+//         .populate("comments.postedBy", "_id username");
+// };
 
 exports.getPostsByUser = (req, res, next) => {
     Post.find({ postedBy: req.profile._id })
