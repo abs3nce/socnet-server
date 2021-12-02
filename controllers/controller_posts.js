@@ -58,17 +58,10 @@ exports.getFollowedFeed = (req, res, next) => {
     const userFollowing = req.profile.following;
     console.log(`${req.profile.username}'s following: `, userFollowing);
     // return res.status(200).json({ message: "success" });
-    const posts = Post.find({ postedBy: { $in: userFollowing } })
-        .then((posts) => {
-            console.log(
-                `API (POSTS) > GETTING FOLLOWED FEED FOR ${req.profile.username}`
-            );
-            console.log(posts);
-            res.status(200).json(posts);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+    Post.find({ postedBy: { $in: userFollowing } }, (err, posts) => {
+        if (err) return res.status(401).json({ error: err });
+        res.status(200).json(posts);
+    });
 };
 
 exports.getPostsByUser = (req, res, next) => {
