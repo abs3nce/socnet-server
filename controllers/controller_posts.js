@@ -54,6 +54,23 @@ exports.getPosts = (req, res, next) => {
         });
 };
 
+exports.getFollowedFeed = (req, res, next) => {
+    const userFollowing = req.profile.following;
+    console.log(`${req.profile.username}'s following: `, userFollowing);
+    // return res.status(200).json({ message: "success" });
+    const posts = Post.find({ postedBy: { $in: userFollowing } })
+        .then((posts) => {
+            console.log(
+                `API (POSTS) > GETTING FOLLOWED FEED FOR ${req.profile.username}`
+            );
+            console.log(posts);
+            res.status(200).json(posts);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+};
+
 exports.getPostsByUser = (req, res, next) => {
     Post.find({ postedBy: req.profile._id })
         //populate pouzivame pretoze v Post scheme mame definovane ze hladame referenciu na User schemu, ak by to bolo opacne pouzili by sme .select
@@ -206,7 +223,7 @@ exports.updatePost = (req, res) => {
                     rej();
                 }
             });
-            
+
             const thumb = await jimp.read(post.image.data);
             post.thumbnailImage.data = await thumb
                 .cover(

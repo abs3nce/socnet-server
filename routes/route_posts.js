@@ -8,9 +8,6 @@ const accountController = require("../controllers/controller_account");
 const userController = require("../controllers/controller_user");
 
 // R O U T E S
-//get vsetkych postov uzivatela
-router.get("/posts/by/:userid", postController.getPostsByUser);
-
 //like unlike
 router.put(
     "/posts/like",
@@ -36,20 +33,27 @@ router.put(
     postController.uncommentPost
 );
 
+//get vsetkych postov v DB
+router.get("/posts", postController.getPosts);
 
+//get vsetkych postov uzivatela
+router.get("/posts/by/:userid", postController.getPostsByUser);
+
+//get vsetkych postov v DB
+router.get(
+    "/posts/followed/:userid",
+    accountController.requireLogin,
+    postController.getFollowedFeed
+);
 
 //get jedneho postu s idckom
 router.get("/posts/:postid", postController.getPost);
-
-//get vsetkych postov v DB
-router.get("/posts", postController.getPosts);
 
 //get thumbnailu obrazku jedneho postu s idckom
 router.get("/posts/pfp/thumb/:postid", postController.getPostThumbnail);
 
 //get obrazku jedneho postu s idckom
 router.get("/posts/pfp/:postid", postController.getPostPicture);
-
 
 //vytvorenie postu
 router.post(
@@ -72,8 +76,6 @@ router.delete(
     [accountController.requireLogin, postController.isOwnerOfPost],
     postController.deletePost
 );
-
-//navratenie imagu postu
 
 //pokial je v URL niekde "userID" tak presmeruje na middleware a funkciu userByID
 router.param("userid", userController.userByID);
