@@ -4,6 +4,7 @@ const formidable = require("formidable");
 const fs = require("fs");
 
 const User = require("../schemes/scheme_user");
+const Post = require("../schemes/scheme_post");
 
 exports.userByID = (req, res, next, id) => {
     User.findById(id)
@@ -85,17 +86,72 @@ exports.updateUser = (req, res, next) => {
     });
 };
 
-exports.deleteUser = (req, res, next) => {
+exports.deleteUser = async (req, res, next) => {
     let user = req.profile;
 
-    user.remove((err, user) => {
-        if (err)
-            return res.status(401).json({ error: "Internal server error" });
+    console.log(`API > REMOVING INSTANCES OF ${user.username} IN COMMENTS`);
+    await Post.updateMany(
+        {
+            "comments.postedBy": req.profile._id,
+        },
+        {
+            $pull: {
+                comments: {
+                    postedBy: req.profile._id,
+                },
+            },
+        }
+    );
+    console.log(
+        `API > FINISHED REMOVING INSTANCES OF ${user.username} IN COMMENTS`
+    );
 
-        console.log(`API > DELETING USER ${user.username}: ${user}`);
-        res.status(200).json({
-            message: `User ${user.username} has been deleted successfully`,
-        });
+    console.log(`API > REMOVING INSTANCES OF ${user.username} IN LIKES`);
+    await Post.updateMany(
+        { likes: req.profile._id },
+        { $pull: { likes: req.profile._id } }
+    );
+    console.log(
+        `API > FINISHED REMOVING INSTANCES OF ${user.username} IN LIKES`
+    );
+
+    console.log(`API > REMOVING INSTANCES OF ${user.username} IN FOLLOWERS`);
+    await User.updateMany(
+        { followers: req.profile._id },
+        { $pull: { followers: req.profile._id } }
+    );
+    console.log(
+        `API > FINISHED REMOVING INSTANCES OF ${user.username} IN FOLLOWERS`
+    );
+
+    console.log(`API > REMOVING INSTANCES OF ${user.username} IN FOLLOWING`);
+    await User.updateMany(
+        { following: req.profile._id },
+        { $pull: { following: req.profile._id } }
+    );
+    console.log(
+        `API > FINISHED REMOVING INSTANCES OF ${user.username} IN FOLLOWING`
+    );
+
+    console.log(`API > DELETING POSTS BY ${user.username}`);
+    await Post.deleteMany({ postedBy: req.profile._id }, (err, post) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: err });
+        }
+    });
+    console.log(`API > FINISHED DELETING POSTS BY ${user.username}`);
+
+    console.log(`API > DELETING ${user.username}`);
+    await user.remove((err, user) => {
+        if (err) {
+            console.log(`API > ERROR WHILE DELETING ${user.username}: `, err);
+            return res.status(401).json({ error: err });
+        }
+    });
+    console.log(`API > FINISHED DELETING ${user.username}: ${user}`);
+    res.status(200).json({
+        message: `User ${user.username} has been deleted successfully`,
     });
 };
 
