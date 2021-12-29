@@ -90,7 +90,10 @@ exports.loginUser = (req, res, next) => {
         console.log(`API (LOGIN) > GENERATING TOKEN FOR USER ${username}`);
 
         //pokial bol user najdeny ale heslo bolo spravne zadane (v authUser() v User modeli funkcii bolo returnute true) >> generovanie tokenu
-        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+        const token = jwt.sign(
+            { _id: user._id, role: user.role },
+            process.env.JWT_SECRET
+        );
 
         //vytvorime cookie so zivotnostou jednej hodiny ktory v sebe drzi token uzivatela, bez neho nie je autorizovatelny, toto bude pouzite ako nutnost sa relohnut po nejakom case
         res.cookie("token", token, { expire: new Date() + 3600 });
@@ -101,7 +104,12 @@ exports.loginUser = (req, res, next) => {
         });
         return res.status(200).json({
             token: token,
-            user: { username: user.username, email: user.email, _id: user._id },
+            user: {
+                username: user.username,
+                email: user.email,
+                _id: user._id,
+                role: user.role,
+            },
         });
     });
 };
