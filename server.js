@@ -17,7 +17,11 @@ mongoose
         useUnifiedTopology: true,
     })
     .then(() => {
-        console.log(`DB > DB READY STATE: (`, mongoose.connection.readyState, ")");
+        console.log(
+            `DB > DB READY STATE: (`,
+            mongoose.connection.readyState,
+            ")"
+        );
         console.log(`DB > CONNECTION SUCCESSFUL`);
     });
 
@@ -74,3 +78,5 @@ const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`API > LISTENING ON PORT: ${port}`);
 });
+
+//db.users.update({_id:ObjectId("00000000000000000000000")},{$set:{role:"administrator"}})

@@ -47,7 +47,9 @@ exports.getAllUsers = (req, res, next) => {
         if (err)
             return res.status(500).json({ error: "Internal server error" });
         res.json(users);
-    }).select("username email _id updated created following followers posts");
+    })
+    // .select("username email _id updated created following followers posts");
+    .select("-passwordHash -salt");
 };
 
 exports.getUser = (req, res, next) => {
