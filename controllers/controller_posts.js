@@ -12,9 +12,10 @@ const Post = require("../schemes/scheme_post");
 //middleware, podla postID sa prida dany post do req objektu ako .post
 exports.postByID = (req, res, next, id) => {
     Post.findById(id)
-        .populate("postedBy", "_id username")
+        .populate("postedBy", "_id username role")
         .populate("comments", "text created")
         .populate("comments.postedBy", "_id username")
+
         .exec((err, post) => {
             if (err || !post) return res.status(401).json({ error: err });
             req.post = post;
@@ -23,9 +24,16 @@ exports.postByID = (req, res, next, id) => {
         });
 };
 
-exports.isOwnerOfPost = (req, res, next) => {
-    let isOwner = req.post && req.auth && req.post.postedBy._id == req.auth._id;
-    if (!isOwner) {
+exports.isUserAuthorizedToAction = (req, res, next) => {
+    let postOwnerUser =
+        req.post && req.auth && req.post.postedBy._id == req.auth._id;
+    let adminUser = req.post && req.auth && req.auth.role === "administrator";
+
+    console.log("req.post:", req.post, "req.auth:", req.auth);
+    console.log("POSTOWNERUSER:", postOwnerUser, "ADMINUSER:", adminUser);
+
+    let isAuthorized = postOwnerUser || adminUser;
+    if (!isAuthorized) {
         return res
             .status(401)
             .json({ error: "You are not authorized to perform this action" });
@@ -41,6 +49,7 @@ exports.getPost = (req, res) => {
 
 exports.getPosts = (req, res, next) => {
     const posts = Post.find()
+        .select("-image -thumbnailImage")
         .populate("postedBy", "_id username created")
         .populate("comments", "text created")
         .populate("comments.postedBy", "_id username")

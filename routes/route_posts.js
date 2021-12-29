@@ -36,6 +36,9 @@ router.put(
 //get vsetkych postov v DB
 router.get("/posts", postController.getPosts);
 
+//get thumbnailu obrazku jedneho postu s idckom
+router.get("/posts/pfp/thumb/:postid", postController.getPostThumbnail);
+
 //get vsetkych postov uzivatela
 router.get("/posts/by/:userid", postController.getPostsByUser);
 
@@ -46,14 +49,11 @@ router.get(
     postController.getFollowedFeed
 );
 
-//get jedneho postu s idckom
-router.get("/posts/:postid", postController.getPost);
-
-//get thumbnailu obrazku jedneho postu s idckom
-router.get("/posts/pfp/thumb/:postid", postController.getPostThumbnail);
-
 //get obrazku jedneho postu s idckom
 router.get("/posts/pfp/:postid", postController.getPostPicture);
+
+//get jedneho postu s idckom
+router.get("/posts/:postid", postController.getPost);
 
 //vytvorenie postu
 router.post(
@@ -66,14 +66,14 @@ router.post(
 //samozrejme treba byt ownerom a prihlaseny
 router.put(
     "/posts/:postid",
-    [accountController.requireLogin, postController.isOwnerOfPost],
+    [accountController.requireLogin, postController.isUserAuthorizedToAction],
     postController.updatePost
 );
 
 //post vieme vymazat targetnutim jeho id, samozrejme treba byt ownerom a byt prihlaseny
 router.delete(
     "/posts/:postid",
-    [accountController.requireLogin, postController.isOwnerOfPost],
+    [accountController.requireLogin, postController.isUserAuthorizedToAction],
     postController.deletePost
 );
 
