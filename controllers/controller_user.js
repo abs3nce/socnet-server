@@ -20,10 +20,21 @@ exports.userByID = (req, res, next, id) => {
         });
 };
 
-exports.isOwnerOfAccount = (req, res, next) => {
+exports.accountActionAuth = (req, res, next) => {
     //pokial existuje v req objekte .profile, .auth a pokial sa .profile._id rovna .auth._id tak sameUser = true
-    let sameUser = req.profile && req.auth && req.profile._id == req.auth._id;
-    if (!sameUser) {
+
+    let accountOwnerUser =
+        req.profile && req.auth && req.profile._id == req.auth._id;
+    let adminUser =
+        req.profile && req.auth && req.auth.role === "administrator";
+
+    console.log("API > req.profile:", req.profile);
+    console.log("API > req.auth:", req.auth);
+    console.log(`API > ${req.profile.username}: accountOwnerUser: ${accountOwnerUser}, adminUser: ${adminUser}`);
+
+    let isAuthorized = accountOwnerUser || adminUser;
+
+    if (!isAuthorized) {
         return res
             .status(401)
             .json({ error: "You are not authorized to perform this action" });

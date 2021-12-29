@@ -66,14 +66,14 @@ router.post(
 //samozrejme treba byt ownerom a prihlaseny
 router.put(
     "/posts/:postid",
-    [accountController.requireLogin, postController.isUserAuthorizedToAction],
+    [accountController.requireLogin, postController.postActionAuth],
     postController.updatePost
 );
 
 //post vieme vymazat targetnutim jeho id, samozrejme treba byt ownerom a byt prihlaseny
 router.delete(
     "/posts/:postid",
-    [accountController.requireLogin, postController.isUserAuthorizedToAction],
+    [accountController.requireLogin, postController.postActionAuth],
     postController.deletePost
 );
 

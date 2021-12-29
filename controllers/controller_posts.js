@@ -15,7 +15,6 @@ exports.postByID = (req, res, next, id) => {
         .populate("postedBy", "_id username role")
         .populate("comments", "text created")
         .populate("comments.postedBy", "_id username")
-
         .exec((err, post) => {
             if (err || !post) return res.status(401).json({ error: err });
             req.post = post;
@@ -24,13 +23,14 @@ exports.postByID = (req, res, next, id) => {
         });
 };
 
-exports.isUserAuthorizedToAction = (req, res, next) => {
+exports.postActionAuth = (req, res, next) => {
     let postOwnerUser =
         req.post && req.auth && req.post.postedBy._id == req.auth._id;
     let adminUser = req.post && req.auth && req.auth.role === "administrator";
 
-    console.log("req.post:", req.post, "req.auth:", req.auth);
-    console.log("POSTOWNERUSER:", postOwnerUser, "ADMINUSER:", adminUser);
+    console.log("API > req.post:", req.post);
+    console.log("API > req.auth:", req.auth);
+    console.log(`API > ${req.post.postedBy.username}: postOwnerUser: ${postOwnerUser}, adminUser: ${adminUser}`);
 
     let isAuthorized = postOwnerUser || adminUser;
     if (!isAuthorized) {
@@ -77,6 +77,7 @@ exports.getFollowedFeed = (req, res, next) => {
         console.log(posts);
         res.status(200).json(posts);
     })
+        .select("-image -thumbnailImage")
         .populate("comments", "text created")
         .populate("comments.postedBy", "_id username")
         .populate("postedBy", "_id username created")
@@ -103,6 +104,7 @@ exports.getFollowedFeed = (req, res, next) => {
 exports.getPostsByUser = (req, res, next) => {
     Post.find({ postedBy: req.profile._id })
         //populate pouzivame pretoze v Post scheme mame definovane ze hladame referenciu na User schemu, ak by to bolo opacne pouzili by sme .select
+        .select("-image -thumbnailImage")
         .populate("postedBy", "_id username")
         .sort({ _id: -1 })
         .exec((err, posts) => {

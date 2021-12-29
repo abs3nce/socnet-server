@@ -35,7 +35,7 @@ router.get("/users/suggested/:userid", userController.suggestedUsers);
 //samozrejme moze iba prihlaseny owner
 router.put(
     "/users/:userid",
-    [accountController.requireLogin, userController.isOwnerOfAccount],
+    [accountController.requireLogin, userController.accountActionAuth],
     userController.updateUser
 );
 
@@ -43,7 +43,7 @@ router.put(
 //samozrejme moze iba prihlaseny owner
 router.delete(
     "/users/:userid",
-    [accountController.requireLogin, userController.isOwnerOfAccount],
+    [accountController.requireLogin, userController.accountActionAuth],
     userController.deleteUser
 );
 
