@@ -53,7 +53,6 @@ exports.getPosts = async (req, res) => {
     const currentPage = req.query.pageNumber || 1;
     const postsPerPage = 3;
 
-    console.log((currentPage - 1) * postsPerPage);
     const posts = await Post.find()
         .countDocuments()
         .then(() => {
@@ -63,7 +62,7 @@ exports.getPosts = async (req, res) => {
                 .populate("comments", "text created")
                 .populate("comments.postedBy", "_id username")
                 .select("-image -thumbnailImage")
-                .sort({ created: -1 })
+                .sort({ _id: -1 })
                 .limit(postsPerPage);
         })
         .then((posts) => {
@@ -72,75 +71,36 @@ exports.getPosts = async (req, res) => {
         .catch((err) => {
             console.log(err);
         });
-
-    // const posts = Post.find()
-    //     .select("-image -thumbnailImage")
-    //     .populate("postedBy", "_id username created")
-    //     .populate("comments", "text created")
-    //     .populate("comments.postedBy", "_id username")
-    //     .sort({ _id: -1 })
-    //     .then((posts) => {
-    //         console.log(`API (POSTS) > GETTING ALL POSTS`);
-    //         res.status(200).json(posts);
-    //     })
-    //     .catch((err) => {
-    //         console.log(err);
-    //     });
 };
 
-// exports.getPosts = (req, res, next) => {
-//     const posts = Post.find()
-//         .select("-image -thumbnailImage")
-//         .populate("postedBy", "_id username created")
-//         .populate("comments", "text created")
-//         .populate("comments.postedBy", "_id username")
-//         .sort({ _id: -1 })
-//         .then((posts) => {
-//             console.log(`API (POSTS) > GETTING ALL POSTS`);
-//             res.status(200).json(posts);
-//         })
-//         .catch((err) => {
-//             console.log(err);
-//         });
-// };
-
-exports.getFollowedFeed = (req, res, next) => {
+exports.getFollowedFeed = async (req, res, next) => {
     let userFollows = req.profile.following;
     userFollows.push(req.profile._id);
 
+    const currentPage = req.query.pageNumber || 1;
+    const postsPerPage = 3;
+
     console.log(`Users followed by ${req.profile.username}: `, userFollows);
 
-    Post.find({ postedBy: { $in: userFollows } }, (err, posts) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({ error: err });
+    const posts = await Post.find(
+        { postedBy: { $in: userFollows } },
+        (err, posts) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: err });
+            }
+            console.log(posts);
+            res.status(200).json(posts);
         }
-        console.log(posts);
-        res.status(200).json(posts);
-    })
+    )
+        .skip((currentPage - 1) * postsPerPage)
         .select("-image -thumbnailImage")
         .populate("postedBy", "_id username created")
         .populate("comments", "text created")
         .populate("comments.postedBy", "_id username")
-        .sort({ _id: -1 });
+        .sort({ _id: -1 })
+        .limit(postsPerPage);
 };
-
-// exports.getFollowedFeed = (req, res, next) => {
-//     const userFollowing = req.profile.following;
-//     console.log(`${req.profile.username}'s following: `, userFollowing);
-//     // return res.status(200).json({ message: "success" });
-//     Post.find({ postedBy: { $in: userFollowing } }, (err, posts) => {
-//         if (err) {
-//             console.log(err);
-//             return res.status(401).json({ error: err });
-//         }
-//         console.log(posts);
-//         res.status(200).json(posts);
-//     })
-//         .populate("postedBy", "_id username created")
-//         .populate("comments", "text created")
-//         .populate("comments.postedBy", "_id username");
-// };
 
 exports.getPostsByUser = (req, res, next) => {
     Post.find({ postedBy: req.profile._id })
