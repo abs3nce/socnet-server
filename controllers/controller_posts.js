@@ -30,7 +30,9 @@ exports.postActionAuth = (req, res, next) => {
 
     console.log("API > req.post:", req.post);
     console.log("API > req.auth:", req.auth);
-    console.log(`API > ${req.post.postedBy.username}: postOwnerUser: ${postOwnerUser}, adminUser: ${adminUser}`);
+    console.log(
+        `API > ${req.post.postedBy.username}: postOwnerUser: ${postOwnerUser}, adminUser: ${adminUser}`
+    );
 
     let isAuthorized = postOwnerUser || adminUser;
     if (!isAuthorized) {
@@ -47,21 +49,60 @@ exports.getPost = (req, res) => {
     return res.json(req.post);
 };
 
-exports.getPosts = (req, res, next) => {
-    const posts = Post.find()
-        .select("-image -thumbnailImage")
-        .populate("postedBy", "_id username created")
-        .populate("comments", "text created")
-        .populate("comments.postedBy", "_id username")
-        .sort({ _id: -1 })
+exports.getPosts = async (req, res) => {
+    const currentPage = req.query.pageNumber || 1;
+    const postsPerPage = 3;
+
+    console.log((currentPage - 1) * postsPerPage);
+    const posts = await Post.find()
+        .countDocuments()
+        .then(() => {
+            return Post.find()
+                .skip((currentPage - 1) * postsPerPage)
+                .populate("postedBy", "_id username created")
+                .populate("comments", "text created")
+                .populate("comments.postedBy", "_id username")
+                .select("-image -thumbnailImage")
+                .sort({ created: -1 })
+                .limit(postsPerPage);
+        })
         .then((posts) => {
-            console.log(`API (POSTS) > GETTING ALL POSTS`);
             res.status(200).json(posts);
         })
         .catch((err) => {
             console.log(err);
         });
+
+    // const posts = Post.find()
+    //     .select("-image -thumbnailImage")
+    //     .populate("postedBy", "_id username created")
+    //     .populate("comments", "text created")
+    //     .populate("comments.postedBy", "_id username")
+    //     .sort({ _id: -1 })
+    //     .then((posts) => {
+    //         console.log(`API (POSTS) > GETTING ALL POSTS`);
+    //         res.status(200).json(posts);
+    //     })
+    //     .catch((err) => {
+    //         console.log(err);
+    //     });
 };
+
+// exports.getPosts = (req, res, next) => {
+//     const posts = Post.find()
+//         .select("-image -thumbnailImage")
+//         .populate("postedBy", "_id username created")
+//         .populate("comments", "text created")
+//         .populate("comments.postedBy", "_id username")
+//         .sort({ _id: -1 })
+//         .then((posts) => {
+//             console.log(`API (POSTS) > GETTING ALL POSTS`);
+//             res.status(200).json(posts);
+//         })
+//         .catch((err) => {
+//             console.log(err);
+//         });
+// };
 
 exports.getFollowedFeed = (req, res, next) => {
     let userFollows = req.profile.following;
@@ -78,9 +119,9 @@ exports.getFollowedFeed = (req, res, next) => {
         res.status(200).json(posts);
     })
         .select("-image -thumbnailImage")
+        .populate("postedBy", "_id username created")
         .populate("comments", "text created")
         .populate("comments.postedBy", "_id username")
-        .populate("postedBy", "_id username created")
         .sort({ _id: -1 });
 };
 
