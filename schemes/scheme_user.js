@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
-    
+
     customLink: {
         type: String,
         trim: true,
