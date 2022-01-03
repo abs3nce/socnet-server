@@ -73,6 +73,22 @@ exports.getPosts = async (req, res) => {
         });
 };
 
+exports.getAllPosts = async (req, res) => {
+    await Post.find()
+        .populate("postedBy", "_id username created")
+        .populate("comments", "text created")
+        .populate("comments.postedBy", "_id username")
+        .select("-image -thumbnailImage")
+        .sort({ _id: -1 })
+        .exec((err, posts) => {
+            if (err) {
+                return res.status(500).json({ error: err });
+            } else {
+                return res.status(200).json(posts);
+            }
+        });
+};
+
 exports.getFollowedFeed = async (req, res, next) => {
     let userFollows = req.profile.following;
     userFollows.push(req.profile._id);

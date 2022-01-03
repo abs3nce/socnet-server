@@ -33,8 +33,11 @@ router.put(
     postController.uncommentPost
 );
 
-//get vsetkych postov v DB
+//get postov v DB
 router.get("/posts", postController.getPosts);
+
+//get vsetkych postov v DB
+router.get("/posts/all", postController.getAllPosts);
 
 //get thumbnailu obrazku jedneho postu s idckom
 router.get("/posts/pfp/thumb/:postid", postController.getPostThumbnail);
