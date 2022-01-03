@@ -24,6 +24,21 @@ const userSchema = new mongoose.Schema({
         trim: true,
     },
 
+    facebookLink: {
+        type: String,
+        trim: true,
+    },
+
+    instagramLink: {
+        type: String,
+        trim: true,
+    },
+    
+    customLink: {
+        type: String,
+        trim: true,
+    },
+
     role: {
         type: String,
         default: "subscriber",
