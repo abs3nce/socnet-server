@@ -49,6 +49,7 @@ const postSchema = new mongoose.Schema({
             FocalLength: Number,
             FocalLengthIn35mmFormat: Number,
             LensModel: String,
+            ExposureCompensation: Number,
         },
     },
 
