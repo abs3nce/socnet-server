@@ -80,3 +80,4 @@ app.listen(port, () => {
 });
 
 //db.users.update({_id:ObjectId("00000000000000000000000")},{$set:{role:"administrator"}})
+//paste querry na OP
