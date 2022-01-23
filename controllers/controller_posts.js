@@ -175,6 +175,10 @@ exports.createPost = (req, res, next) => {
         //     return res.status(401).json({ error: "Body must not be empty" });
         // }
 
+        if (!body || !body.length) {
+            body = " ";
+        }
+
         if (body.length > 1500) {
             return res.status(401).json({
                 error: "Maximálna dĺžka tela fotografie je 1500 znakov",
