@@ -162,7 +162,7 @@ exports.createPost = (req, res, next) => {
         if (!title || !title.length) {
             return res
                 .status(401)
-                .json({ error: "Názov nesmie ostať prázdny" });
+                .json({ error: "Názov fotografie nesmie ostať prázdny" });
         }
 
         if (title.length < 8 || title.length > 150) {
