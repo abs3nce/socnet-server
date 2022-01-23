@@ -157,12 +157,12 @@ exports.createPost = (req, res, next) => {
 
         // -----------------------------------------------------------------------------
         // provizorna validacia udajov z inputu formu
-        const { title, body, categories, tags } = fields;
+        let { title, body, categories, tags } = fields;
 
         if (!title || !title.length) {
             return res
                 .status(401)
-                .json({ error: "Názov fotografie nesmie ostať prázdny" });
+                .json({ error: "Názov nesmie ostať prázdny" });
         }
 
         if (title.length < 8 || title.length > 150) {
@@ -171,12 +171,16 @@ exports.createPost = (req, res, next) => {
             });
         }
 
-        // if (!body || !body.length) {
-        //     return res.status(401).json({ error: "Body must not be empty" });
-        // }
-
         if (!body || !body.length) {
-            post.body = " ";
+            return res
+                .status(401)
+                .json({ error: "Telo fotografie nesmie ostať prázdne" });
+        }
+
+        if (body.length < 8) {
+            return res.status(401).json({
+                error: "Minimálna dĺžka tela fotografie je 8 znakov",
+            });
         }
 
         if (body.length > 1500) {
@@ -230,8 +234,7 @@ exports.createPost = (req, res, next) => {
 
         post.save((err, result) => {
             //ulozenie postu do DB
-            if (err)
-                return res.status(500).json({ error: "Internal server error" });
+            if (err) return res.status(500).json({ error: err });
             res.status(200).json({ result: result });
             console.log(`API > POST DATA: `, result);
         });
