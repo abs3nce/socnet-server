@@ -175,11 +175,11 @@ exports.createPost = (req, res, next) => {
         //     return res.status(401).json({ error: "Body must not be empty" });
         // }
 
-        // if (body.length < 8 || body.length > 1500) {
-        //     return res.status(401).json({
-        //         error: "The body's length must be between 8 to 1500 characters",
-        //     });
-        // }
+        if (body.length > 1500) {
+            return res.status(401).json({
+                error: "Maximálna dĺžka tela fotografie je 1500 znakov",
+            });
+        }
 
         if (files.image) {
             //validacia velkosti image
