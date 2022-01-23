@@ -176,7 +176,7 @@ exports.createPost = (req, res, next) => {
         // }
 
         if (!body || !body.length) {
-            body = " ";
+            post.body = " ";
         }
 
         if (body.length > 1500) {
