@@ -2,6 +2,7 @@
 const _ = require("lodash");
 const formidable = require("formidable");
 const fs = require("fs");
+const jimp = require("jimp");
 
 const User = require("../schemes/scheme_user");
 const Post = require("../schemes/scheme_post");
@@ -14,7 +15,10 @@ exports.userByID = (req, res, next, id) => {
         .exec((err, user) => {
             if (err)
                 return res.status(500).json({ error: "Internal server error" });
-            if (!user) return res.status(401).json({ error: "User not found" });
+            if (!user)
+                return res
+                    .status(401)
+                    .json({ error: "Užívateľ nebol nájdený" });
             req.profile = user; // pridanie informacii o userovi do req.profile
             next();
         });
@@ -30,14 +34,16 @@ exports.accountActionAuth = (req, res, next) => {
 
     console.log("API > req.profile:", req.profile);
     console.log("API > req.auth:", req.auth);
-    console.log(`API > ${req.profile.username}: accountOwnerUser: ${accountOwnerUser}, adminUser: ${adminUser}`);
+    console.log(
+        `API > ${req.profile.username}: accountOwnerUser: ${accountOwnerUser}, adminUser: ${adminUser}`
+    );
 
     let isAuthorized = accountOwnerUser || adminUser;
 
     if (!isAuthorized) {
         return res
             .status(401)
-            .json({ error: "You are not authorized to perform this action" });
+            .json({ error: "Nie ste oprávnený vykonať túto akciu" });
     }
     next();
 };
@@ -48,8 +54,8 @@ exports.getAllUsers = (req, res, next) => {
             return res.status(500).json({ error: "Internal server error" });
         res.json(users);
     })
-    // .select("username email _id updated created following followers posts");
-    .select("-passwordHash -salt");
+        // .select("username email _id updated created following followers posts");
+        .select("-passwordHash -salt");
 };
 
 exports.getUser = (req, res, next) => {
@@ -71,22 +77,29 @@ exports.getUserProfilePicture = (req, res, next) => {
 exports.updateUser = (req, res, next) => {
     let form = new formidable.IncomingForm();
     form.keepExtensions = true;
-    form.parse(req, (err, fields, files) => {
+    form.parse(req, async (err, fields, files) => {
         //chceme spracovat form fields a aj pripadne uploadovane images
         if (err)
-            return res
-                .status(500)
-                .json({ error: "Photo could not be uploaded" });
+            return res.status(500).json({ error: "Problém s nahrávaním dát" });
         let user = req.profile;
         user = _.extend(user, fields); //nahranie novych udajov do user objektu
         user.updated = Date.now();
 
         console.log(`user from FE: `, user);
         if (files.profilePicture) {
-            user.profilePicture.data = fs.readFileSync(
+            user.profilePicture.contentType = files.profilePicture.type;
+            const profilePictureData = fs.readFileSync(
                 files.profilePicture.path
             );
-            user.profilePicture.contentType = files.profilePicture.type;
+
+            const thumb = await jimp.read(profilePictureData);
+            user.profilePicture.data = await thumb
+                .cover(
+                    256,
+                    256,
+                    jimp.HORIZONTAL_ALIGN_CENTER | jimp.VERTICAL_ALIGN_MIDDLE
+                )
+                .getBufferAsync(jimp.AUTO);
         }
 
         user.save((err, result) => {
@@ -98,6 +111,37 @@ exports.updateUser = (req, res, next) => {
         });
     });
 };
+
+// exports.updateUser = (req, res, next) => {
+//     let form = new formidable.IncomingForm();
+//     form.keepExtensions = true;
+//     form.parse(req, (err, fields, files) => {
+//         //chceme spracovat form fields a aj pripadne uploadovane images
+//         if (err)
+//             return res
+//                 .status(500)
+//                 .json({ error: "Problém s nahrávaním dát" });
+//         let user = req.profile;
+//         user = _.extend(user, fields); //nahranie novych udajov do user objektu
+//         user.updated = Date.now();
+
+//         console.log(`user from FE: `, user);
+//         if (files.profilePicture) {
+//             user.profilePicture.data = fs.readFileSync(
+//                 files.profilePicture.path
+//             );
+//             user.profilePicture.contentType = files.profilePicture.type;
+//         }
+
+//         user.save((err, result) => {
+//             if (err) return res.status(500).json({ error: err });
+
+//             user.salt = undefined; //odstranenie saltu a hashu pretoze user sa bude preposielat na FE
+//             user.passwordHash = undefined;
+//             res.status(200).json(user);
+//         });
+//     });
+// };
 
 exports.deleteUser = async (req, res, next) => {
     let user = req.profile;

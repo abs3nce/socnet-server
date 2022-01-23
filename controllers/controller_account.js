@@ -23,7 +23,7 @@ exports.registerUser = async (req, res, next) => {
         console.log(
             `API (REGISTER) > USER REGISTRATION DENIED, USERNAME ALREADY EXISTS (${req.body.username})`
         );
-        return res.status(401).json({ error: "Username already in use" });
+        return res.status(401).json({ error: "Užívateľské meno už existuje" });
     }
 
     emailExists = await User.findOne({ email: req.body.email });
@@ -31,7 +31,7 @@ exports.registerUser = async (req, res, next) => {
         console.log(
             `API (REGISTER) > USER REGISTRATION DENIED, EMAIL ALREADY EXISTS (${req.body.email})`
         );
-        return res.status(401).json({ error: "Email already in use" });
+        return res.status(401).json({ error: "Email už existuje" });
     }
 
     console.log(
@@ -50,7 +50,7 @@ exports.registerUser = async (req, res, next) => {
             _id: user._id,
             created: user.created,
         },
-        message: "Registration successful",
+        message: "Registrácia prebehla úspešne",
     });
 };
 
@@ -74,7 +74,7 @@ exports.loginUser = (req, res, next) => {
             console.log(`API (LOGIN) > USER ${username} NOT FOUND`);
             return res
                 .status(401)
-                .json({ error: "Invalid credentials, please try again" });
+                .json({ error: "Nesprávne údaje, skúste znova" });
         }
         //pokial bol user najdeny ale heslo bolo zle zadane (v authUser() metode User schemy bolo returnute false) >> zamietnutie
         if (!user.authUser(password)) {
@@ -83,7 +83,7 @@ exports.loginUser = (req, res, next) => {
             );
             return res
                 .status(401)
-                .json({ error: "Invalid credentials, please try again" });
+                .json({ error: "Nesprávne údaje, skúste znova" });
         }
         console.log(`API (LOGIN) > USER ${username} FOUND`);
         console.log(`API (LOGIN) > USER ${username} HAS VALID CREDENTIALS`);
@@ -117,7 +117,7 @@ exports.loginUser = (req, res, next) => {
 exports.logoutUser = (req, res, next) => {
     //proste vymazeme cookie s menom token a tym padom odhlasime uzivatela
     res.clearCookie("token");
-    res.status(200).json({ message: "User signed out" });
+    res.status(200).json({ message: "Užívateľ odhlásený" });
 };
 
 exports.requireLogin = expressJWT({
@@ -130,11 +130,11 @@ exports.requireLogin = expressJWT({
 
 exports.forgotPassword = (req, res) => {
     if (!req.body)
-        return res.status(400).json({ message: "No request body found" });
+        return res.status(400).json({ message: "Problém so zmenou hesla" });
     if (!req.body.email)
         return res
             .status(400)
-            .json({ message: "No email found in request body" });
+            .json({ message: "Email nenájdený v request.body" });
 
     console.log(
         `API (FORGOT PASSWORD) > FINDING USER WITH EMAIL "${req.body.email}"`
@@ -146,7 +146,7 @@ exports.forgotPassword = (req, res) => {
             console.log(`API (FORGOT PASSWORD) > USER NOT FOUND`);
             console.log(`API (FORGOT PASSWORD) > RETURNING WITH ERROR`);
             return res.status(500).json({
-                error: "User with that email does not exist. Please try again using different email address.",
+                error: "Užívateľ s touto emailovou adresou neexistuje. Skúste inú adresu",
             });
         }
 
@@ -174,9 +174,9 @@ exports.forgotPassword = (req, res) => {
         const emailData = {
             from: "noreply@socnet-app.com",
             to: email,
-            subject: "Password Reset Instrucions",
-            text: `Please use the following link to reset you password: ${process.env.CLIENT_RESET_PASSWORD_URL}/reset-password/${token}`,
-            html: `<p>Please use the following link to reset you password: </p><p>${process.env.CLIENT_RESET_PASSWORD_URL}/reset-password/${token}</p>`,
+            subject: "Inštrukcie na zmenu hesla",
+            text: `Prosím použite následujúci link na zmenu hesla: ${process.env.CLIENT_RESET_PASSWORD_URL}/reset-password/${token}`,
+            html: `<p>Prosím použite následujúci link na zmenu hesla: </p><p>${process.env.CLIENT_RESET_PASSWORD_URL}/reset-password/${token}</p>`,
         };
         console.log(
             `API (FORGOT PASSWORD) > FINISHED CREATING NEW EMAIL MESSAGE`
@@ -194,7 +194,7 @@ exports.forgotPassword = (req, res) => {
                     `API (FORGOT PASSWORD) > EMAIL HAS BEEN SUCCESSFULLY SENT TO USER ${user.username} ON ${user.email} `
                 );
                 return res.status(200).json({
-                    message: `Email has been successfully sent to ${user.email}. Check your inbox (or spam) for further instructions.`,
+                    message: `Email bol úspešne zaslaný na ${user.email}. Pre ďalšie inštrukcie skontrolujte schránku alebo spam.`,
                 });
             }
         });
@@ -242,62 +242,9 @@ exports.resetPassword = (req, res) => {
                 user
             );
             res.status(200).json({
-                message: "Great! Now you can login with your new password",
+                message:
+                    "Zmena hesla úspešná. Teraz sa prihláste s novým heslom",
             });
         });
     });
 };
-
-// exports.socialLogin = (req, res) => {
-//     //pokus o registraciu hladanim uzivatela s req.body.email
-//     let user = User.findOne({ email: req.body.email }, (err, user) => {
-//         if (err || !user) {
-//             //vytvorenie noveho usera a nasledny login
-//             user = new User(req.body);
-//             req.profile = user;
-//             user.save();
-
-//             //generovanie noveho tokenu pre uzivatela
-//             const token = jwt.sign(
-//                 { _id: user._id, iss: "NODEAPI" },
-//                 process.env.JWT_SECRET
-//             );
-//             res.cookie("token", token, { expire: new Date() + 3600 });
-
-//             //navratenie udajov na frontend
-//             const { _id, username, email } = user;
-//             return res.status(200).json({
-//                 token: token,
-//                 user: {
-//                     username,
-//                     email,
-//                     _id,
-//                 },
-//             });
-//         } else {
-//             //aktualizovanie existujuceho uzivatela s novymi udajmi (social info) a nasledny login
-//             req.profile = user;
-//             user = _.extend(user, req.body);
-//             user.updated = Date.now();
-//             user.save();
-
-//             //generovanie noveho tokenu pre uzivatela
-//             const token = jwt.sign(
-//                 { _id: user._id, iss: "NODEAPI" },
-//                 process.env.JWT_SECRET
-//             );
-//             res.cookie("token", token, { expire: new Date() + 3600 });
-
-//             //navratenie udajov na frontend
-//             const { _id, username, email } = user;
-//             return res.status(200).json({
-//                 token: token,
-//                 user: {
-//                     username,
-//                     email,
-//                     _id,
-//                 },
-//             });
-//         }
-//     });
-// };

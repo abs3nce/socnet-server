@@ -38,7 +38,7 @@ exports.postActionAuth = (req, res, next) => {
     if (!isAuthorized) {
         return res
             .status(401)
-            .json({ error: "You are not authorized to perform this action" });
+            .json({ error: "Nie ste oprávnený vykonať túto akciu" });
     }
     next();
 };
@@ -147,9 +147,7 @@ exports.createPost = (req, res, next) => {
     form.parse(req, async (err, fields, files) => {
         //handler pre error pri nahravani image
         if (err)
-            return res
-                .status(500)
-                .json({ error: "Image could not be uploaded" });
+            return res.status(500).json({ error: "Problém s nahrávaním dát" });
 
         let post = new Post(fields); //vytvorenie postu podla schemy Post s udajmi z fieldov z FE
 
@@ -162,31 +160,33 @@ exports.createPost = (req, res, next) => {
         const { title, body, categories, tags } = fields;
 
         if (!title || !title.length) {
-            return res.status(401).json({ error: "Title must not be empty" });
+            return res
+                .status(401)
+                .json({ error: "Názov nesmie ostať prázdny" });
         }
 
         if (title.length < 8 || title.length > 150) {
             return res.status(401).json({
-                error: "The title's length must be between 8 to 150 characters",
+                error: "Názov musí mať aspoň 8 znakov a maximálne 150 znakov",
             });
         }
 
-        if (!body || !body.length) {
-            return res.status(401).json({ error: "Body must not be empty" });
-        }
+        // if (!body || !body.length) {
+        //     return res.status(401).json({ error: "Body must not be empty" });
+        // }
 
-        if (body.length < 8 || body.length > 1500) {
-            return res.status(401).json({
-                error: "The body's length must be between 8 to 1500 characters",
-            });
-        }
+        // if (body.length < 8 || body.length > 1500) {
+        //     return res.status(401).json({
+        //         error: "The body's length must be between 8 to 1500 characters",
+        //     });
+        // }
 
         if (files.image) {
             //validacia velkosti image
             if (files.image.size > 10000000) {
                 return res
                     .status(401)
-                    .json({ error: "Maximal size of an image is 10 MB" });
+                    .json({ error: "Maximálna veľkosť fotografie je 10 MB" });
             }
             // -----------------------------------------------------------------------------
 
@@ -216,8 +216,8 @@ exports.createPost = (req, res, next) => {
             const thumb = await jimp.read(post.image.data);
             post.thumbnailImage.data = await thumb
                 .cover(
-                    256,
-                    256,
+                    512,
+                    512,
                     jimp.HORIZONTAL_ALIGN_CENTER | jimp.VERTICAL_ALIGN_MIDDLE
                 )
                 .getBufferAsync(jimp.AUTO);
@@ -240,9 +240,7 @@ exports.updatePost = (req, res) => {
     form.parse(req, async (err, fields, files) => {
         //chceme spracovat form fields a aj pripadne uploadovane images
         if (err)
-            return res
-                .status(500)
-                .json({ error: "Photo could not be uploaded" });
+            return res.status(500).json({ error: "Problém s nahrávaním dát" });
 
         let post = req.post;
         post = _.extend(post, fields); //nahranie novych udajov do post objektu

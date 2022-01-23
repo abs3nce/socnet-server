@@ -1,24 +1,24 @@
 exports.userRegisterValidator = (req, res, next) => {
     //username check
-    req.check("username", "Username must not be empty").notEmpty();
-    req.check(
-        "username",
-        "Length of the username must be between 3 to 25 characters"
-    ).isLength({ min: 3, max: 25 });
+    req.check("username", "Meno nesmie ostať prázdne").notEmpty();
+    req.check("username", "Meno musí mať maximálne 32 znakov").isLength({
+        min: 1,
+        max: 32,
+    });
 
     //email check
-    req.check("email", "Email must not be empty").notEmpty();
-    req.check("email").isEmail().withMessage("Invalid form of email");
+    req.check("email", "Email nesmie ostať prázdny").notEmpty();
+    req.check("email").isEmail().withMessage("Nesprávna forma emailu");
 
     //password check
-    req.check("password", "Password must not be empty").notEmpty();
+    req.check("password", "Heslo nesmie ostať byť prázdne").notEmpty();
     req.check("password")
         .isLength({ min: 8 })
-        .withMessage("Password must be at least 8 characters long")
+        .withMessage("Heslo musí mať aspoň 8 znakov")
         .matches(/\d/)
         //matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, "i"); mozno na test kebyze rovno uzivatela oboznamim s kriteriami na heslo
         //a to 1 cislo, jedno male pismeno, jedno velke pismeno a jeden specialny znak a je minimalne 8 znakov dlhe
-        .withMessage("Password must contain at least 1 number");
+        .withMessage("Heslo musí obsahovať aspon jedno číslo");
 
     //check for error
     const errors = req.validationErrors();
@@ -32,12 +32,12 @@ exports.userRegisterValidator = (req, res, next) => {
 
 exports.passwordResetValidator = (req, res, next) => {
     //password check
-    req.check("newPassword", "Password must not be empty").notEmpty();
+    req.check("newPassword", "Heslo nesmie ostať byť prázdne").notEmpty();
     req.check("newPassword")
         .isLength({ min: 8 })
-        .withMessage("Password must be at least 8 characters long")
+        .withMessage("Heslo musí mať aspoň 8 znakov")
         .matches(/\d/)
-        .withMessage("Password must contain at least 1 number");
+        .withMessage("Heslo musí obsahovať aspon jedno číslo");
     //matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, "i"); mozno na test kebyze rovno uzivatela oboznamim s kriteriami na heslo
     //a to 1 cislo, jedno male pismeno, jedno velke pismeno a jeden specialny znak a je minimalne 8 znakov dlhe
 
